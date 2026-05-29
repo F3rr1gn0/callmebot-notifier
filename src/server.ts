@@ -11,8 +11,12 @@ const apikey = process.env.APIKEY ?? "";
 const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN ?? "";
 const telegramChatId = process.env.TELEGRAM_CHAT_ID ?? "";
 
-const whatsapp = new CallMeBotChannel(new CallMeBotNotifier({ phone, apikey, logLevel: "info" }));
-const channels: NotificationChannel[] = [whatsapp];
+const channels: NotificationChannel[] = [];
+if (phone && apikey) {
+  channels.push(new CallMeBotChannel(new CallMeBotNotifier({ phone, apikey, logLevel: "info" })));
+} else {
+  console.warn("PHONE/APIKEY missing: WhatsApp channel disabled");
+}
 if (telegramBotToken && telegramChatId) channels.push(new TelegramChannel({ botToken: telegramBotToken, chatId: telegramChatId }));
 if (process.env.SMTP_HOST && process.env.EMAIL_FROM && process.env.EMAIL_TO) {
   channels.push(

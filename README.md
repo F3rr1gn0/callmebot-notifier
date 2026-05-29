@@ -68,6 +68,24 @@ Endpoints:
 - `POST /notify`
 - `POST /webhook`
 
+Quick test:
+
+```bash
+curl -X POST http://localhost:3000/notify \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Test notify"}'
+```
+
+```bash
+curl -X POST http://localhost:3000/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Alert","message":"CPU high","severity":"warn","source":"server-1"}'
+```
+
+```bash
+curl http://localhost:3000/health
+```
+
 ## Docker
 
 ```bash
