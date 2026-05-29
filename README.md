@@ -1,5 +1,9 @@
 # callmebot-notifier
 
+[![npm version](https://img.shields.io/npm/v/callmebot-notifier.svg)](https://www.npmjs.com/package/callmebot-notifier)
+[![coverage](https://img.shields.io/badge/coverage-98.8%25-brightgreen)](./coverage/index.html)
+[![license](https://img.shields.io/npm/l/callmebot-notifier.svg)](./LICENSE)
+
 TypeScript-first notifier for CallMeBot WhatsApp API.
 
 Support:
@@ -17,6 +21,16 @@ Support:
 
 ```bash
 npm i callmebot-notifier
+```
+
+## Release
+
+Prima pubblicazione:
+
+```bash
+npm run build
+npm test
+npm publish --access public
 ```
 
 ## Setup CallMeBot

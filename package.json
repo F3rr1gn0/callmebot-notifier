@@ -3,10 +3,28 @@
   "version": "1.0.0",
   "description": "TypeScript-first notifier for CallMeBot WhatsApp API with Telegram and Email fallbacks.",
   "license": "MIT",
+  "author": "F3rr1gn0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/F3rr1gn0/callmebot-notifier.git"
+  },
+  "bugs": {
+    "url": "https://github.com/F3rr1gn0/callmebot-notifier/issues"
+  },
+  "homepage": "https://github.com/F3rr1gn0/callmebot-notifier#readme",
+  "keywords": [
+    "callmebot",
+    "whatsapp",
+    "notification",
+    "telegram",
+    "email",
+    "express",
+    "typescript"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
