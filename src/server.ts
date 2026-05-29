@@ -1,0 +1,35 @@
+import { CallMeBotNotifier } from "./client.js";
+import { CallMeBotChannel } from "./channels/callmebot.channel.js";
+import { TelegramChannel } from "./channels/telegram.channel.js";
+import { EmailChannel } from "./channels/email.channel.js";
+import { FallbackChannel } from "./channels/fallback.channel.js";
+import { createExpressApp } from "./integrations/express.js";
+import type { NotificationChannel } from "./types.js";
+
+const phone = process.env.PHONE ?? "";
+const apikey = process.env.APIKEY ?? "";
+const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN ?? "";
+const telegramChatId = process.env.TELEGRAM_CHAT_ID ?? "";
+
+const whatsapp = new CallMeBotChannel(new CallMeBotNotifier({ phone, apikey, logLevel: "info" }));
+const channels: NotificationChannel[] = [whatsapp];
+if (telegramBotToken && telegramChatId) channels.push(new TelegramChannel({ botToken: telegramBotToken, chatId: telegramChatId }));
+if (process.env.SMTP_HOST && process.env.EMAIL_FROM && process.env.EMAIL_TO) {
+  channels.push(
+    new EmailChannel({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT ?? 587),
+      secure: process.env.SMTP_SECURE === "true",
+      user: process.env.SMTP_USER || undefined,
+      pass: process.env.SMTP_PASS || undefined,
+      from: process.env.EMAIL_FROM,
+      to: process.env.EMAIL_TO
+    })
+  );
+}
+
+const app = createExpressApp(new FallbackChannel(channels));
+const port = Number(process.env.PORT ?? 3000);
+app.listen(port, () => {
+  console.log(`callmebot-notifier listening on ${port}`);
+});
