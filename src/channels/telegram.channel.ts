@@ -1,4 +1,4 @@
-import type { NotificationChannel, NotificationResult, TelegramConfig } from "../types.js";
+import type { NotificationChannel, TelegramConfig } from "../types.js";
 import { ValidationError } from "../errors.js";
 
 export class TelegramChannel implements NotificationChannel {
@@ -13,14 +13,13 @@ export class TelegramChannel implements NotificationChannel {
     this.fetchImpl = config.fetch ?? fetch;
   }
 
-  async send(message: string): Promise<NotificationResult> {
+  async send(message: string): Promise<void> {
     const url = new URL(`/bot${this.config.botToken}/sendMessage`, this.baseUrl);
     const response = await this.fetchImpl(url.toString(), {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ chat_id: this.config.chatId, text: message })
     });
-    if (!response.ok) return { ok: false, channel: "telegram", message, error: await response.text() };
-    return { ok: true, channel: "telegram", message };
+    if (!response.ok) throw new Error(await response.text());
   }
 }

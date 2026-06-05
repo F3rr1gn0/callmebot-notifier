@@ -1,7 +1,7 @@
 {
   "name": "callmebot-notifier",
-  "version": "1.1.0",
-  "description": "TypeScript-first notifier for CallMeBot WhatsApp API with Telegram and Email fallbacks.",
+  "version": "1.2.0",
+  "description": "Send WhatsApp notifications from Node.js with Telegram and Email fallback.",
   "license": "MIT",
   "author": "F3rr1gn0",
   "type": "module",

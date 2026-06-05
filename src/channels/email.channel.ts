@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import type { EmailConfig, NotificationChannel, NotificationResult } from "../types.js";
+import type { EmailConfig, NotificationChannel } from "../types.js";
 import { ValidationError } from "../errors.js";
 
 export class EmailChannel implements NotificationChannel {
@@ -18,13 +18,12 @@ export class EmailChannel implements NotificationChannel {
     });
   }
 
-  async send(message: string): Promise<NotificationResult> {
+  async send(message: string): Promise<void> {
     await this.transport.sendMail({
       from: this.config.from,
       to: this.config.to,
       subject: "CallMeBot notifier",
       text: message
     });
-    return { ok: true, channel: "email", message };
   }
 }

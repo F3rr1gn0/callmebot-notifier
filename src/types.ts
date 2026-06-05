@@ -34,8 +34,37 @@ export interface NotificationResult {
 
 export interface NotificationChannel {
   name: string;
-  send(message: string): Promise<NotificationResult>;
+  send(message: string): Promise<void>;
 }
+
+export type NotifyAttempt = {
+  channel: string;
+  ok: boolean;
+  attempt: number;
+  error?: string;
+};
+
+export type NotifyResult = {
+  ok: boolean;
+  deliveredBy?: string;
+  attempts: NotifyAttempt[];
+};
+
+export type RetryPolicy = {
+  attempts: number;
+  delayMs: number;
+};
+
+export type ReminderAfter = `${number}${"m" | "h" | "d"}` | string;
+
+export type NotifyOptions = {
+  primary?: NotificationChannel;
+  fallback?: NotificationChannel;
+  channels?: NotificationChannel[];
+  message: string;
+  retry?: RetryPolicy;
+  reminderAfter?: ReminderAfter;
+};
 
 export interface WebhookPayload {
   title?: string;

@@ -1,170 +1,154 @@
 # callmebot-notifier
 
-[![npm version](https://img.shields.io/npm/v/callmebot-notifier.svg)](https://www.npmjs.com/package/callmebot-notifier)
-[![coverage](https://img.shields.io/badge/coverage-98.8%25-brightgreen)](./coverage/index.html)
-[![license](https://img.shields.io/npm/l/callmebot-notifier.svg)](./LICENSE)
+Send WhatsApp notifications from Node.js with Telegram and Email fallback.
 
-TypeScript-first notifier for CallMeBot WhatsApp API.
+Includes:
 
-Support:
-- ESM + CommonJS
-- build in `dist/`
-- `.d.ts`
-- Express integration
-- webhook formatter
+- WhatsApp via CallMeBot
+- `notify()` routing
 - Telegram fallback
 - Email fallback
-- Docker
-- tests
+- Express integration
+- Webhook formatter
+- ESM + CommonJS
+- TypeScript types
+
+> CallMeBot is not the official WhatsApp API. Use this package for personal and low-risk notifications.
 
 ## Install
 
 ```bash
-npm i callmebot-notifier
+npm install callmebot-notifier
 ```
 
-## Release
-
-Prima pubblicazione:
-
-```bash
-npm run build
-npm test
-npm publish --access public
-```
-
-## Setup CallMeBot
-
-Need:
-- `PHONE`
-- `APIKEY`
-
-CallMeBot uses a public WhatsApp bridge. Not official WhatsApp API.
-Use for personal, non-critical notifications only.
-
-## TypeScript
+## Simple WhatsApp
 
 ```ts
 import { CallMeBotNotifier } from "callmebot-notifier";
 
-const client = new CallMeBotNotifier({
+const notifier = new CallMeBotNotifier({
   phone: process.env.PHONE!,
   apikey: process.env.APIKEY!
 });
 
-await client.sendWhatsApp("Hello");
+await notifier.sendWhatsApp("Deployment done");
+```
+
+## `notify()` with fallback
+
+```ts
+import { notify, whatsapp, telegram } from "callmebot-notifier";
+
+await notify({
+  primary: whatsapp({
+    phone: process.env.PHONE!,
+    apikey: process.env.APIKEY!
+  }),
+  fallback: telegram({
+    botToken: process.env.TELEGRAM_BOT_TOKEN!,
+    chatId: process.env.TELEGRAM_CHAT_ID!
+  }),
+  message: "Server is down"
+});
 ```
 
 ## CommonJS
 
 ```js
-const { CallMeBotNotifier } = require("callmebot-notifier");
+const { notify, whatsapp, telegram } = require("callmebot-notifier");
 
-const client = new CallMeBotNotifier({
-  phone: process.env.PHONE,
-  apikey: process.env.APIKEY
+await notify({
+  primary: whatsapp({
+    phone: process.env.PHONE,
+    apikey: process.env.APIKEY
+  }),
+  fallback: telegram({
+    botToken: process.env.TELEGRAM_BOT_TOKEN,
+    chatId: process.env.TELEGRAM_CHAT_ID
+  }),
+  message: "Server is down"
 });
 ```
 
-## Express
+## Retry policy
 
 ```ts
-import { CallMeBotNotifier, CallMeBotChannel, createExpressApp } from "callmebot-notifier";
-import express from "express";
+import { notify, whatsapp, telegram, email } from "callmebot-notifier";
 
-const client = new CallMeBotNotifier({ phone: process.env.PHONE!, apikey: process.env.APIKEY! });
-const app = createExpressApp(new CallMeBotChannel(client));
+await notify({
+  channels: [
+    whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! }),
+    telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN!, chatId: process.env.TELEGRAM_CHAT_ID! }),
+    email({
+      host: process.env.SMTP_HOST!,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: process.env.SMTP_SECURE === "true",
+      user: process.env.SMTP_USER!,
+      pass: process.env.SMTP_PASS!,
+      from: process.env.EMAIL_FROM!,
+      to: process.env.EMAIL_TO!
+    })
+  ],
+  message: "Build failed",
+  retry: { attempts: 3, delayMs: 1000 }
+});
+```
+
+## Express usage
+
+```ts
+import { createExpressApp, FallbackChannel, whatsapp, telegram } from "callmebot-notifier";
+
+const app = createExpressApp(
+  new FallbackChannel([
+    whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! }),
+    telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN!, chatId: process.env.TELEGRAM_CHAT_ID! })
+  ])
+);
+
 app.listen(3000);
 ```
 
-Endpoints:
-- `GET /health`
-- `POST /notify`
-- `POST /webhook`
+## Result shape
 
-Quick test:
-
-```bash
-curl -X POST http://localhost:3000/notify \
-  -H "Content-Type: application/json" \
-  -d '{"message":"Test notify"}'
-```
-
-```bash
-curl -X POST http://localhost:3000/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Alert","message":"CPU high","severity":"warn","source":"server-1"}'
-```
-
-```bash
-curl http://localhost:3000/health
-```
-
-## Docker
-
-```bash
-docker build -t callmebot-notifier .
-docker run --env-file .env -p 3000:3000 callmebot-notifier
-docker compose up -d
-```
-
-## Webhook formatter
+`notify()` returns:
 
 ```ts
-import { formatWebhookMessage } from "callmebot-notifier";
-
-const msg = formatWebhookMessage({
-  title: "Deploy",
-  message: "ok",
-  severity: "info",
-  source: "github"
-});
+type NotifyResult = {
+  ok: boolean;
+  deliveredBy?: string;
+  attempts: Array<{
+    channel: string;
+    ok: boolean;
+    attempt: number;
+    error?: string;
+  }>;
+};
 ```
 
-## Fallback chain
+Helper:
 
-Order:
-1. WhatsApp
-2. Telegram
-3. Email
+```ts
+import { summarizeNotifyResult } from "callmebot-notifier";
 
-## Telegram fallback
+const summary = summarizeNotifyResult(result);
+```
 
-Need:
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_CHAT_ID`
+## v1.3 prep
 
-## Email fallback
+`reminderAfter` is accepted in types now.
 
-Need:
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_SECURE`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `EMAIL_FROM`
-- `EMAIL_TO`
+Planned only:
 
-## n8n
+- reminder scheduling
+- delivery tracking
+- persistence
 
-Use `HTTP Request` node:
-- method `POST`
-- URL `http://host:3000/notify`
-- body JSON `{ "message": "..." }`
+## Limitations
 
-Webhook workflow:
-- webhook node -> HTTP Request to `/webhook`
-
-## Home Assistant
-
-Use `rest_command` or automation to call `/notify`.
-
-## Env
-
-See `.env.example`
-
-## Limits
-
-- CallMeBot not official WhatsApp API
-- retries and rate limit are simple
-- use for low-risk notifications
+- No dashboard
+- No authentication layer
+- No database
+- No SaaS backend
+- CallMeBot depends on a third-party service
+- Intended for personal or low-risk alerts

@@ -16,18 +16,18 @@ import { ValidationError } from "../src/errors.js";
 describe("channels", () => {
   it("wraps callmebot client", async () => {
     const client = { sendWhatsApp: vi.fn().mockResolvedValue({ ok: true, channel: "whatsapp", message: "m" }) } as unknown as CallMeBotNotifier;
-    await expect(new CallMeBotChannel(client).send("m")).resolves.toMatchObject({ ok: true, channel: "whatsapp" });
+    await expect(new CallMeBotChannel(client).send("m")).resolves.toBeUndefined();
   });
 
   it("sends telegram", async () => {
     const fetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" });
     const channel = new TelegramChannel({ botToken: "t", chatId: "c", fetch });
-    await expect(channel.send("hello")).resolves.toMatchObject({ ok: true, channel: "telegram" });
+    await expect(channel.send("hello")).resolves.toBeUndefined();
   });
 
   it("sends email", async () => {
     const channel = new EmailChannel({ host: "smtp", port: 587, secure: false, from: "a@example.com", to: "b@example.com" });
-    await expect(channel.send("hello")).resolves.toMatchObject({ ok: true, channel: "email" });
+    await expect(channel.send("hello")).resolves.toBeUndefined();
     expect(sendMail).toHaveBeenCalled();
   });
 
@@ -53,6 +53,6 @@ describe("channels", () => {
   it("handles telegram non-ok", async () => {
     const fetch = vi.fn().mockResolvedValue({ ok: false, text: async () => "bad" });
     const channel = new TelegramChannel({ botToken: "t", chatId: "c", fetch });
-    await expect(channel.send("hello")).resolves.toMatchObject({ ok: false, channel: "telegram" });
+    await expect(channel.send("hello")).rejects.toThrow("bad");
   });
 });

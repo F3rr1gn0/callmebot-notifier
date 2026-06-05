@@ -20,16 +20,24 @@ export function createExpressApp(channel: NotificationChannel) {
   app.post("/notify", async (req: Request, res: Response) => {
     const parsed = notifySchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
-    const result = await channel.send(parsed.data.message);
-    return res.status(result.ok ? 200 : 502).json(result);
+    try {
+      await channel.send(parsed.data.message);
+      return res.status(200).json({ ok: true });
+    } catch (error) {
+      return res.status(502).json({ ok: false, error: error instanceof Error ? error.message : String(error) });
+    }
   });
 
   app.post("/webhook", async (req: Request, res: Response) => {
     const parsed = webhookSchema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
     const message = formatWebhookMessage(parsed.data);
-    const result = await channel.send(message);
-    return res.status(result.ok ? 200 : 502).json(result);
+    try {
+      await channel.send(message);
+      return res.status(200).json({ ok: true });
+    } catch (error) {
+      return res.status(502).json({ ok: false, error: error instanceof Error ? error.message : String(error) });
+    }
   });
 
   return app;
