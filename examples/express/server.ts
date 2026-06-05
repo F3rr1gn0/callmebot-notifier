@@ -1,6 +1,7 @@
 import { CallMeBotNotifier, CallMeBotChannel, createExpressApp } from "../../src/index.js";
+import type { NotificationChannel } from "../../src/types.js";
 
-const channels = [];
+const channels: NotificationChannel[] = [];
 if (process.env.PHONE && process.env.APIKEY) {
   const client = new CallMeBotNotifier({ phone: process.env.PHONE, apikey: process.env.APIKEY, logLevel: "info" });
   channels.push(new CallMeBotChannel(client));
