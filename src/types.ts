@@ -90,3 +90,17 @@ export interface EmailConfig {
   from: string;
   to: string;
 }
+
+export interface DiscordConfig {
+  webhookUrl: string;
+  username?: string;
+  avatarUrl?: string;
+  fetch?: typeof fetch;
+}
+
+export interface SlackConfig {
+  webhookUrl: string;
+  username?: string;
+  iconEmoji?: string;
+  fetch?: typeof fetch;
+}

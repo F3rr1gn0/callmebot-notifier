@@ -8,6 +8,8 @@ export * from "./client.js";
 export * from "./channels/callmebot.channel.js";
 export * from "./channels/telegram.channel.js";
 export * from "./channels/email.channel.js";
+export * from "./channels/discord.channel.js";
+export * from "./channels/slack.channel.js";
 export * from "./channels/fallback.channel.js";
 export * from "./channels/factories.js";
 export * from "./integrations/express.js";

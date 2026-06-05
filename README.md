@@ -8,6 +8,8 @@ Includes:
 - `notify()` routing
 - Telegram fallback
 - Email fallback
+- Discord plugin channel
+- Slack plugin channel
 - Express integration
 - Webhook formatter
 - ESM + CommonJS
@@ -52,6 +54,20 @@ await notify({
 });
 ```
 
+## Plugin channels
+
+```ts
+import { discord, slack, notify } from "callmebot-notifier";
+
+await notify({
+  channels: [
+    discord({ webhookUrl: process.env.DISCORD_WEBHOOK_URL! }),
+    slack({ webhookUrl: process.env.SLACK_WEBHOOK_URL! })
+  ],
+  message: "Release done"
+});
+```
+
 ## CommonJS
 
 ```js
@@ -67,6 +83,18 @@ await notify({
     chatId: process.env.TELEGRAM_CHAT_ID
   }),
   message: "Server is down"
+});
+```
+
+```js
+const { notify, discord, slack } = require("callmebot-notifier");
+
+await notify({
+  channels: [
+    discord({ webhookUrl: process.env.DISCORD_WEBHOOK_URL }),
+    slack({ webhookUrl: process.env.SLACK_WEBHOOK_URL })
+  ],
+  message: "Release done"
 });
 ```
 
@@ -152,3 +180,4 @@ Planned only:
 - No SaaS backend
 - CallMeBot depends on a third-party service
 - Intended for personal or low-risk alerts
+- Discord and Slack use webhook URLs only
