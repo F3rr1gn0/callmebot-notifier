@@ -76,10 +76,18 @@ export type NotifyOptions = {
   fallback?: NotificationChannel;
   channels?: NotificationChannel[];
   message: MessageInput;
+  routes?: Partial<Record<NotificationSeverity, NotificationChannel[]>>;
   retry?: RetryPolicy;
   reminderAfter?: ReminderAfter;
   formatter?: MessageFormatter;
   messageFormat?: MessageFormatPreset;
+};
+
+export type NotifyTemplateInput = {
+  title: string;
+  message: string;
+  source?: string;
+  severity?: NotificationSeverity;
 };
 
 export interface TelegramConfig {

@@ -14,7 +14,7 @@ describe("formatMessage", () => {
   });
 
   it("formats plain and json presets", () => {
-    const payload = { title: "Deploy", severity: "info", source: "CI", message: "done" };
+    const payload = { title: "Deploy", severity: "info" as const, source: "CI", message: "done" };
     expect(formatMessage(payload, "plain")).toBe("Deploy\nSeverity: info\nSource: CI\ndone");
     expect(formatMessage(payload, "json")).toContain('"title":"Deploy"');
   });

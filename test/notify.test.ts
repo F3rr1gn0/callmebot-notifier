@@ -103,4 +103,47 @@ describe("notify", () => {
     });
     expect(channel.send).toHaveBeenCalledWith(expect.stringContaining('"title":"Deploy"'));
   });
+
+  it("routes by severity when configured", async () => {
+    const info = { name: "info", send: vi.fn().mockResolvedValue(undefined) };
+    const critical = { name: "critical", send: vi.fn().mockResolvedValue(undefined) };
+
+    const result = await notify({
+      channels: [info],
+      routes: {
+        critical: [critical]
+      },
+      message: {
+        title: "CPU high",
+        message: "load spike",
+        severity: "critical"
+      }
+    });
+
+    expect(result.deliveredBy).toBe("critical");
+    expect(critical.send).toHaveBeenCalledWith("*CPU high*\nSeverity: critical\nload spike");
+    expect(info.send).not.toHaveBeenCalled();
+  });
+
+  it("supports alert template helper", async () => {
+    const channel = { name: "a", send: vi.fn().mockResolvedValue(undefined) };
+    const result = await notify.alert(
+      { title: "Deploy", message: "done" },
+      { channels: [channel] }
+    );
+
+    expect(result.ok).toBe(true);
+    expect(channel.send).toHaveBeenCalledWith("*Deploy*\nSeverity: critical\ndone");
+  });
+
+  it("supports incident template helper", async () => {
+    const channel = { name: "a", send: vi.fn().mockResolvedValue(undefined) };
+    const result = await notify.incident(
+      { title: "Incident", message: "db down", source: "api" },
+      { channels: [channel] }
+    );
+
+    expect(result.ok).toBe(true);
+    expect(channel.send).toHaveBeenCalledWith("*Incident*\nSeverity: critical\nSource: api\ndb down");
+  });
 });

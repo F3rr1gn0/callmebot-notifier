@@ -1,4 +1,4 @@
-import type { MessageFormatPreset, MessageFormatter, MessageInput, NotificationMessagePayload } from "./types.js";
+import type { MessageFormatPreset, MessageFormatter, MessageInput, NotificationMessagePayload, NotifyTemplateInput } from "./types.js";
 
 const isPayload = (input: MessageInput): input is NotificationMessagePayload => typeof input !== "string";
 
@@ -24,3 +24,10 @@ export function resolveMessage(
   if (!isPayload(input)) return "";
   return formatter ? formatter(input) || formatMessage(input, preset) : formatMessage(input, preset);
 }
+
+export const createTemplatePayload = (input: NotifyTemplateInput, severity?: NotifyTemplateInput["severity"]): NotificationMessagePayload => ({
+  title: input.title,
+  message: input.message,
+  source: input.source,
+  severity: severity ?? input.severity
+});

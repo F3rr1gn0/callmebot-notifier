@@ -11,6 +11,7 @@ Includes:
 - WhatsApp via CallMeBot
 - Telegram, Email, Discord, Slack
 - `notify()` routing and fallback
+- `notify.alert()` and `notify.incident()`
 - formatter presets
 - webhook formatting
 - Express integration
@@ -80,6 +81,67 @@ await notify({
   ],
   message: "Release done"
 });
+```
+
+## Severity Routing
+
+```ts
+import { notify, whatsapp, telegram, email } from "callmebot-notifier";
+
+await notify({
+  routes: {
+    info: [telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN ?? "", chatId: process.env.TELEGRAM_CHAT_ID ?? "" })],
+    critical: [
+      whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" }),
+      email({
+        host: process.env.SMTP_HOST ?? "",
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: process.env.SMTP_SECURE === "true",
+        user: process.env.SMTP_USER ?? undefined,
+        pass: process.env.SMTP_PASS ?? undefined,
+        from: process.env.EMAIL_FROM ?? "",
+        to: process.env.EMAIL_TO ?? ""
+      })
+    ]
+  },
+  message: {
+    title: "CPU high",
+    message: "Load spike on api-1",
+    severity: "critical"
+  }
+});
+```
+
+## Templates
+
+```ts
+import { notify, whatsapp } from "callmebot-notifier";
+
+await notify.alert(
+  {
+    title: "Deploy",
+    message: "Application deployed",
+    source: "GitHub Actions"
+  },
+  {
+    channels: [
+      whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" })
+    ]
+  }
+);
+
+await notify.incident(
+  {
+    title: "Database down",
+    message: "Primary DB unavailable",
+    source: "api"
+  },
+  {
+    channels: [
+      whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" })
+    ]
+  }
+);
 ```
 
 ## CommonJS

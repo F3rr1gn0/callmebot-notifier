@@ -1,4 +1,4 @@
-import type { NotifyOptions, NotifyResult, NotificationChannel } from "./types.js";
+import type { NotifyOptions, NotifyResult, NotificationChannel, NotificationSeverity, NotifyTemplateInput } from "./types.js";
 import { ValidationError } from "./errors.js";
 import { sleep } from "./retry.js";
 import { resolveMessage } from "./format.js";
@@ -14,16 +14,18 @@ const redactError = (error: unknown) => {
     .replace(/\b[A-Za-z0-9_\-]{24,}\b/g, "[redacted]");
 };
 
-const toChannels = (options: NotifyOptions): NotificationChannel[] => {
+const toChannels = (options: NotifyOptions, severity?: NotificationSeverity): NotificationChannel[] => {
+  if (severity && options.routes?.[severity]?.length) return [...options.routes[severity]!];
   if (options.channels?.length) return [...options.channels];
   const channels = [options.primary, options.fallback].filter(Boolean) as NotificationChannel[];
   return channels;
 };
 
-export async function notify(options: NotifyOptions): Promise<NotifyResult> {
+async function notifyBase(options: NotifyOptions): Promise<NotifyResult> {
+  const severity = typeof options.message === "string" ? undefined : options.message.severity;
   const message = resolveMessage(options.message, options.formatter, options.messageFormat).trim();
   if (!message) throw new ValidationError("message is required");
-  const channels = toChannels(options);
+  const channels = toChannels(options, severity);
   if (!channels.length) throw new ValidationError("at least one channel is required");
 
   const retry = options.retry ?? { attempts: 1, delayMs: 0 };
@@ -44,6 +46,23 @@ export async function notify(options: NotifyOptions): Promise<NotifyResult> {
 
   return { ok: false, attempts };
 }
+
+const notifyWithTemplate = async (
+  template: NotifyTemplateInput,
+  options: Omit<NotifyOptions, "message"> & { routes?: NotifyOptions["routes"] }
+) =>
+  notifyBase({
+    ...options,
+    message: template
+  });
+
+export const alert = (template: NotifyTemplateInput, options: Omit<NotifyOptions, "message"> = {}) =>
+  notifyWithTemplate({ ...template, severity: template.severity ?? "critical" }, options);
+
+export const incident = (template: NotifyTemplateInput, options: Omit<NotifyOptions, "message"> = {}) =>
+  notifyWithTemplate({ ...template, severity: template.severity ?? "critical" }, options);
+
+export const notify = Object.assign(notifyBase, { alert, incident });
 
 export function summarizeNotifyResult(result: NotifyResult) {
   return {

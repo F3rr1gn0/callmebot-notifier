@@ -18,7 +18,7 @@ const makeRes = () => {
 
 describe("createExpressApp", () => {
   it("returns health", async () => {
-    const channel: NotificationChannel = { name: "x", send: async () => ({ ok: true, channel: "whatsapp", message: "ok" }) };
+    const channel: NotificationChannel = { name: "x", send: async () => undefined };
     const app = createExpressApp(channel);
     const route = app._router.stack.find((l: any) => l.route?.path === "/health");
     const handler = route.route.stack[0].handle;
@@ -28,7 +28,7 @@ describe("createExpressApp", () => {
   });
 
   it("rejects invalid notify payload", async () => {
-    const app = createExpressApp({ name: "x", send: async () => ({ ok: true, channel: "whatsapp", message: "ok" }) });
+    const app = createExpressApp({ name: "x", send: async () => undefined });
     const route = app._router.stack.find((l: any) => l.route?.path === "/notify");
     const handler = route.route.stack[0].handle;
     const res = makeRes();
@@ -58,7 +58,7 @@ describe("createExpressApp", () => {
   });
 
   it("accepts webhook payload", async () => {
-    const channel: NotificationChannel = { name: "x", send: async () => ({ ok: true, channel: "whatsapp", message: "ok" }) };
+    const channel: NotificationChannel = { name: "x", send: async () => undefined };
     const app = createExpressApp(channel);
     const route = app._router.stack.find((l: any) => l.route?.path === "/webhook");
     const handler = route.route.stack[0].handle;
@@ -68,7 +68,7 @@ describe("createExpressApp", () => {
   });
 
   it("rejects invalid webhook payload", async () => {
-    const channel: NotificationChannel = { name: "x", send: async () => ({ ok: true, channel: "whatsapp", message: "ok" }) };
+    const channel: NotificationChannel = { name: "x", send: async () => undefined };
     const app = createExpressApp(channel);
     const route = app._router.stack.find((l: any) => l.route?.path === "/webhook");
     const handler = route.route.stack[0].handle;

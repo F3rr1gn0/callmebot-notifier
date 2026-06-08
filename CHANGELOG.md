@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+-> Added severity routing
+-> Added `notify.alert()` and `notify.incident()`
+-> Added unified template payloads
+
 ## 1.4.0
 
 -> Added `fromEnv()` for zero-friction setup
