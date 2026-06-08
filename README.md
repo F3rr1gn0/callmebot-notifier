@@ -4,19 +4,16 @@
 [![coverage](https://img.shields.io/badge/coverage-99.72%25-brightgreen)](./coverage/index.html)
 [![language](https://img.shields.io/badge/language-TypeScript-3178C6.svg)](https://www.typescriptlang.org/)
 
-Send WhatsApp notifications from Node.js with Telegram and Email fallback.
+Send notifications from Node.js with one API and multiple delivery paths.
 
 Includes:
 
 - WhatsApp via CallMeBot
-- `notify()` routing
-- Telegram fallback
-- Email fallback
-- Discord plugin channel
-- Slack plugin channel
-- Formatter presets
+- Telegram, Email, Discord, Slack
+- `notify()` routing and fallback
+- formatter presets
+- webhook formatting
 - Express integration
-- Webhook formatter
 - ESM + CommonJS
 - TypeScript types
 
@@ -28,7 +25,7 @@ Includes:
 npm install callmebot-notifier
 ```
 
-## Env
+## Quick Start
 
 ```env
 PHONE=393331112223
@@ -48,46 +45,38 @@ EMAIL_FROM=
 EMAIL_TO=
 ```
 
-## Simple WhatsApp
-
 ```ts
-import { CallMeBotNotifier } from "callmebot-notifier";
+import { fromEnv } from "callmebot-notifier";
 
-const notifier = new CallMeBotNotifier({
-  phone: process.env.PHONE!,
-  apikey: process.env.APIKEY!
-});
-
-await notifier.sendWhatsApp("Deployment done");
+const notifier = fromEnv();
+await notifier.send("Deployment done");
 ```
 
-## `notify()` with fallback
+## Usage
 
 ```ts
 import { notify, whatsapp, telegram } from "callmebot-notifier";
 
 await notify({
   primary: whatsapp({
-    phone: process.env.PHONE!,
-    apikey: process.env.APIKEY!
+    phone: process.env.PHONE ?? "",
+    apikey: process.env.APIKEY ?? ""
   }),
   fallback: telegram({
-    botToken: process.env.TELEGRAM_BOT_TOKEN!,
-    chatId: process.env.TELEGRAM_CHAT_ID!
+    botToken: process.env.TELEGRAM_BOT_TOKEN ?? "",
+    chatId: process.env.TELEGRAM_CHAT_ID ?? ""
   }),
   message: "Server is down"
 });
 ```
-
-## Plugin channels
 
 ```ts
 import { discord, slack, notify } from "callmebot-notifier";
 
 await notify({
   channels: [
-    discord({ webhookUrl: process.env.DISCORD_WEBHOOK_URL! }),
-    slack({ webhookUrl: process.env.SLACK_WEBHOOK_URL! })
+    discord({ webhookUrl: process.env.DISCORD_WEBHOOK_URL ?? "" }),
+    slack({ webhookUrl: process.env.SLACK_WEBHOOK_URL ?? "" })
   ],
   message: "Release done"
 });
@@ -111,18 +100,6 @@ await notify({
 });
 ```
 
-```js
-const { notify, discord, slack } = require("callmebot-notifier");
-
-await notify({
-  channels: [
-    discord({ webhookUrl: process.env.DISCORD_WEBHOOK_URL }),
-    slack({ webhookUrl: process.env.SLACK_WEBHOOK_URL })
-  ],
-  message: "Release done"
-});
-```
-
 ## Retry policy
 
 ```ts
@@ -130,16 +107,16 @@ import { notify, whatsapp, telegram, email } from "callmebot-notifier";
 
 await notify({
   channels: [
-    whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! }),
-    telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN!, chatId: process.env.TELEGRAM_CHAT_ID! }),
+    whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" }),
+    telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN ?? "", chatId: process.env.TELEGRAM_CHAT_ID ?? "" }),
     email({
-      host: process.env.SMTP_HOST!,
+      host: process.env.SMTP_HOST ?? "",
       port: Number(process.env.SMTP_PORT || 587),
       secure: process.env.SMTP_SECURE === "true",
-      user: process.env.SMTP_USER!,
-      pass: process.env.SMTP_PASS!,
-      from: process.env.EMAIL_FROM!,
-      to: process.env.EMAIL_TO!
+      user: process.env.SMTP_USER ?? undefined,
+      pass: process.env.SMTP_PASS ?? undefined,
+      from: process.env.EMAIL_FROM ?? "",
+      to: process.env.EMAIL_TO ?? ""
     })
   ],
   message: "Build failed",
@@ -147,7 +124,7 @@ await notify({
 });
 ```
 
-## Formatter API
+## Formatter
 
 ```ts
 import { formatMessage, notify, whatsapp } from "callmebot-notifier";
@@ -158,26 +135,8 @@ const message = formatMessage({
   source: "GitHub Actions",
   message: "Application deployed"
 });
-```
-
-Preset:
-
-```ts
 await notify({
-  channels: [whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! })],
-  message: {
-    title: "Deploy",
-    severity: "info",
-    source: "GitHub Actions",
-    message: "Application deployed"
-  },
-  messageFormat: "plain"
-});
-```
-
-```ts
-await notify({
-  channels: [whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! })],
+  channels: [whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" })],
   message: {
     title: "Deploy",
     severity: "info",
@@ -194,8 +153,8 @@ import { createExpressApp, FallbackChannel, whatsapp, telegram } from "callmebot
 
 const app = createExpressApp(
   new FallbackChannel([
-    whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! }),
-    telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN!, chatId: process.env.TELEGRAM_CHAT_ID! })
+    whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" }),
+    telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN ?? "", chatId: process.env.TELEGRAM_CHAT_ID ?? "" })
   ])
 );
 
@@ -227,22 +186,9 @@ import { summarizeNotifyResult } from "callmebot-notifier";
 const summary = summarizeNotifyResult(result);
 ```
 
-## v1.3 prep
+## Notes
 
-`reminderAfter` is accepted in types now.
-
-Planned only:
-
-- reminder scheduling
-- delivery tracking
-- persistence
-
-## Limitations
-
-- No dashboard
-- No authentication layer
-- No database
-- No SaaS backend
-- CallMeBot depends on a third-party service
+- CallMeBot is a third-party WhatsApp bridge, not the official WhatsApp API
 - Intended for personal or low-risk alerts
 - Discord and Slack use webhook URLs only
+- `fromEnv()` is the quickest way to bootstrap a notifier from environment variables

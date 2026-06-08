@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { CallMeBotNotifier } from "../src/client.js";
 import { HttpError, RetryExhaustedError, ValidationError } from "../src/errors.js";
+import { fromEnv } from "../src/env.js";
 
 describe("CallMeBotNotifier", () => {
   it("validates config", () => {
@@ -40,5 +41,32 @@ describe("CallMeBotNotifier", () => {
     const signal = new AbortController().signal;
     await client.sendWhatsApp("ciao", { signal });
     expect(fetch).toHaveBeenCalled();
+  });
+});
+
+describe("fromEnv", () => {
+  it("creates a fallback channel from env", () => {
+    const channel = fromEnv({
+      env: {
+        PHONE: "123",
+        APIKEY: "key"
+      } as NodeJS.ProcessEnv
+    });
+
+    expect(channel.name).toBe("fallback");
+  });
+
+  it("fails on partial whatsapp env", () => {
+    expect(() =>
+      fromEnv({
+        env: {
+          PHONE: "123"
+        } as NodeJS.ProcessEnv
+      })
+    ).toThrow("Missing env APIKEY");
+  });
+
+  it("fails when nothing is configured", () => {
+    expect(() => fromEnv({ env: {} as NodeJS.ProcessEnv })).toThrow("No channels configured");
   });
 });

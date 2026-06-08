@@ -13,4 +13,5 @@ export * from "./channels/discord.channel.js";
 export * from "./channels/slack.channel.js";
 export * from "./channels/fallback.channel.js";
 export * from "./channels/factories.js";
+export * from "./env.js";
 export * from "./integrations/express.js";
