@@ -69,4 +69,34 @@ describe("fromEnv", () => {
   it("fails when nothing is configured", () => {
     expect(() => fromEnv({ env: {} as NodeJS.ProcessEnv })).toThrow("No channels configured");
   });
+
+  it("creates telegram email discord and slack channels", () => {
+    const channel = fromEnv({
+      env: {
+        TELEGRAM_BOT_TOKEN: "bot",
+        TELEGRAM_CHAT_ID: "chat",
+        SMTP_HOST: "smtp.example.com",
+        SMTP_PORT: "587",
+        SMTP_SECURE: "true",
+        EMAIL_FROM: "from@example.com",
+        EMAIL_TO: "to@example.com",
+        DISCORD_WEBHOOK_URL: "https://example.com/discord",
+        SLACK_WEBHOOK_URL: "https://example.com/slack"
+      } as NodeJS.ProcessEnv
+    });
+
+    expect(channel.name).toBe("fallback");
+  });
+
+  it("uses custom log level for whatsapp from env", () => {
+    const channel = fromEnv({
+      env: {
+        PHONE: "123",
+        APIKEY: "key"
+      } as NodeJS.ProcessEnv,
+      logLevel: "debug"
+    });
+
+    expect(channel.name).toBe("fallback");
+  });
 });

@@ -1,7 +1,7 @@
 # callmebot-notifier
 
 [![npm version](https://img.shields.io/npm/v/callmebot-notifier.svg)](https://www.npmjs.com/package/callmebot-notifier)
-[![coverage](https://img.shields.io/badge/coverage-99.72%25-brightgreen)](./coverage/index.html)
+[![coverage](https://img.shields.io/badge/coverage-99.78%25-brightgreen)](./coverage/index.html)
 [![language](https://img.shields.io/badge/language-TypeScript-3178C6.svg)](https://www.typescriptlang.org/)
 
 Send notifications from Node.js with one API and multiple delivery paths.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatMessage, resolveMessage } from "../src/format.js";
+import { createTemplatePayload, formatMessage, resolveMessage } from "../src/format.js";
 
 describe("formatMessage", () => {
   it("formats payload", () => {
@@ -25,5 +25,20 @@ describe("formatMessage", () => {
 
   it("falls back to preset when formatter empty", () => {
     expect(resolveMessage({ message: "done" }, () => "", "plain")).toBe("done");
+  });
+
+  it("uses formatter when it returns content", () => {
+    expect(resolveMessage({ message: "done" }, () => "custom", "plain")).toBe("custom");
+  });
+
+  it("creates template payload", () => {
+    expect(
+      createTemplatePayload({ title: "Deploy", message: "done", source: "CI" }, "critical")
+    ).toMatchObject({
+      title: "Deploy",
+      message: "done",
+      source: "CI",
+      severity: "critical"
+    });
   });
 });

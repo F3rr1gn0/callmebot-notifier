@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.2
+
+-> Coverage refresh and README cleanup
+
 ## 1.5.1
 
 -> Added `onResult` and `onError` hooks

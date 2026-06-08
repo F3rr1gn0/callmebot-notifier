@@ -1,6 +1,6 @@
 {
   "name": "callmebot-notifier",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Typed notification library for Node.js with WhatsApp, Telegram, Email, Discord, and Slack.",
   "license": "MIT",
   "author": "F3rr1gn0",
