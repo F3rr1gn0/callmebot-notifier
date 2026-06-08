@@ -33,6 +33,15 @@ describe("notify", () => {
     expect(result.attempts[0]).toMatchObject({ channel: "a", ok: false, attempt: 1 });
   });
 
+  it("throws when no channels are given", async () => {
+    await expect(notify({ channels: [], message: "m" })).rejects.toThrow("at least one channel is required");
+  });
+
+  it("throws when payload formats to empty", async () => {
+    const channel = { name: "a", send: vi.fn().mockResolvedValue(undefined) };
+    await expect(notify({ channels: [channel], message: { message: "   " } })).rejects.toThrow("message is required");
+  });
+
   it("supports primary and fallback helpers", async () => {
     const result = await notify({
       primary: whatsapp({ phone: "123", apikey: "key", fetch: vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" }) }),
@@ -51,5 +60,47 @@ describe("notify", () => {
     const channel = { name: "a", send: vi.fn().mockRejectedValue(new Error("apikey=secret token=abc")) };
     const result = await notify({ channels: [channel], message: "m" });
     expect(result.attempts[0].error).not.toContain("secret");
+  });
+
+  it("redacts long token-like blobs", async () => {
+    const channel = { name: "a", send: vi.fn().mockRejectedValue(new Error("abcDEF1234567890abcDEF1234567890")) };
+    const result = await notify({ channels: [channel], message: "m" });
+    expect(result.attempts[0].error).toContain("[redacted]");
+  });
+
+  it("stringifies non-error failures", async () => {
+    const channel = { name: "a", send: vi.fn().mockRejectedValue("boom") };
+    const result = await notify({ channels: [channel], message: "m" });
+    expect(result.attempts[0].error).toBe("boom");
+  });
+
+  it("uses custom formatter for payload", async () => {
+    const channel = { name: "a", send: vi.fn().mockResolvedValue(undefined) };
+    await notify({
+      channels: [channel],
+      message: { title: "Deploy", message: "done" },
+      formatter: (payload) => `${payload.title}: ${payload.message}`
+    });
+    expect(channel.send).toHaveBeenCalledWith("Deploy: done");
+  });
+
+  it("uses plain preset", async () => {
+    const channel = { name: "a", send: vi.fn().mockResolvedValue(undefined) };
+    await notify({
+      channels: [channel],
+      message: { title: "Deploy", message: "done" },
+      messageFormat: "plain"
+    });
+    expect(channel.send).toHaveBeenCalledWith("Deploy\ndone");
+  });
+
+  it("uses json preset", async () => {
+    const channel = { name: "a", send: vi.fn().mockResolvedValue(undefined) };
+    await notify({
+      channels: [channel],
+      message: { title: "Deploy", message: "done" },
+      messageFormat: "json"
+    });
+    expect(channel.send).toHaveBeenCalledWith(expect.stringContaining('"title":"Deploy"'));
   });
 });

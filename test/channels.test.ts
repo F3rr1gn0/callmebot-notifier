@@ -47,9 +47,15 @@ describe("channels", () => {
     expect(sendMail).toHaveBeenCalled();
   });
 
-  it("validates telegram and email config", () => {
+  it("validates telegram config", () => {
     expect(() => new TelegramChannel({ botToken: "", chatId: "c" })).toThrow(ValidationError);
-    expect(() => new EmailChannel({ host: "", port: 587, secure: false, from: "", to: "" })).toThrow(ValidationError);
+    expect(() => new TelegramChannel({ botToken: "t", chatId: "" })).toThrow(ValidationError);
+  });
+
+  it("validates email config", () => {
+    expect(() => new EmailChannel({ host: "", port: 587, secure: false, from: "a", to: "b" })).toThrow(ValidationError);
+    expect(() => new EmailChannel({ host: "smtp", port: 587, secure: false, from: "", to: "b" })).toThrow(ValidationError);
+    expect(() => new EmailChannel({ host: "smtp", port: 587, secure: false, from: "a", to: "" })).toThrow(ValidationError);
   });
 
   it("handles telegram non-ok", async () => {
@@ -67,6 +73,12 @@ describe("channels", () => {
     }));
   });
 
+  it("fails discord webhook", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: false, text: async () => "discord bad" });
+    const channel = new DiscordChannel({ webhookUrl: "https://example.com/discord", fetch });
+    await expect(channel.send("hello")).rejects.toThrow("discord bad");
+  });
+
   it("sends slack webhook", async () => {
     const fetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" });
     const channel = new SlackChannel({ webhookUrl: "https://example.com/slack", fetch });
@@ -76,8 +88,17 @@ describe("channels", () => {
     }));
   });
 
-  it("validates discord and slack config", () => {
+  it("fails slack webhook", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: false, text: async () => "slack bad" });
+    const channel = new SlackChannel({ webhookUrl: "https://example.com/slack", fetch });
+    await expect(channel.send("hello")).rejects.toThrow("slack bad");
+  });
+
+  it("validates discord config", () => {
     expect(() => new DiscordChannel({ webhookUrl: "" })).toThrow(ValidationError);
+  });
+
+  it("validates slack config", () => {
     expect(() => new SlackChannel({ webhookUrl: "" })).toThrow(ValidationError);
   });
 });

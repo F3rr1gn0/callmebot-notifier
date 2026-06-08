@@ -1,5 +1,9 @@
 # callmebot-notifier
 
+[![npm version](https://img.shields.io/npm/v/callmebot-notifier.svg)](https://www.npmjs.com/package/callmebot-notifier)
+[![coverage](https://img.shields.io/badge/coverage-99.72%25-brightgreen)](./coverage/index.html)
+[![language](https://img.shields.io/badge/language-TypeScript-3178C6.svg)](https://www.typescriptlang.org/)
+
 Send WhatsApp notifications from Node.js with Telegram and Email fallback.
 
 Includes:
@@ -10,6 +14,7 @@ Includes:
 - Email fallback
 - Discord plugin channel
 - Slack plugin channel
+- Formatter presets
 - Express integration
 - Webhook formatter
 - ESM + CommonJS
@@ -21,6 +26,26 @@ Includes:
 
 ```bash
 npm install callmebot-notifier
+```
+
+## Env
+
+```env
+PHONE=393331112223
+APIKEY=your-callmebot-apikey
+PORT=3000
+LOG_LEVEL=info
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+DISCORD_WEBHOOK_URL=
+SLACK_WEBHOOK_URL=
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+EMAIL_FROM=
+EMAIL_TO=
 ```
 
 ## Simple WhatsApp
@@ -119,6 +144,46 @@ await notify({
   ],
   message: "Build failed",
   retry: { attempts: 3, delayMs: 1000 }
+});
+```
+
+## Formatter API
+
+```ts
+import { formatMessage, notify, whatsapp } from "callmebot-notifier";
+
+const message = formatMessage({
+  title: "Deploy",
+  severity: "info",
+  source: "GitHub Actions",
+  message: "Application deployed"
+});
+```
+
+Preset:
+
+```ts
+await notify({
+  channels: [whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! })],
+  message: {
+    title: "Deploy",
+    severity: "info",
+    source: "GitHub Actions",
+    message: "Application deployed"
+  },
+  messageFormat: "plain"
+});
+```
+
+```ts
+await notify({
+  channels: [whatsapp({ phone: process.env.PHONE!, apikey: process.env.APIKEY! })],
+  message: {
+    title: "Deploy",
+    severity: "info",
+    source: "GitHub Actions",
+    message: "Application deployed"
+  }
 });
 ```
 

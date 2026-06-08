@@ -36,6 +36,27 @@ describe("createExpressApp", () => {
     expect(res.statusCode).toBe(400);
   });
 
+  it("returns 502 when notify send fails", async () => {
+    const app = createExpressApp({ name: "x", send: async () => { throw new Error("boom"); } });
+    const route = app._router.stack.find((l: any) => l.route?.path === "/notify");
+    const handler = route.route.stack[0].handle;
+    const res = makeRes();
+    await handler({ body: { message: "hi" } }, res);
+    expect(res.statusCode).toBe(502);
+    expect(res.body).toMatchObject({ ok: false, error: "boom" });
+  });
+
+  it("stringifies non-error notify failure", async () => {
+    const channel: NotificationChannel = { name: "x", send: (async () => { throw "boom"; }) as any };
+    const app = createExpressApp(channel);
+    const route = app._router.stack.find((l: any) => l.route?.path === "/notify");
+    const handler = route.route.stack[0].handle;
+    const res = makeRes();
+    await handler({ body: { message: "hi" } }, res);
+    expect(res.statusCode).toBe(502);
+    expect(res.body).toMatchObject({ ok: false, error: "boom" });
+  });
+
   it("accepts webhook payload", async () => {
     const channel: NotificationChannel = { name: "x", send: async () => ({ ok: true, channel: "whatsapp", message: "ok" }) };
     const app = createExpressApp(channel);
@@ -54,5 +75,27 @@ describe("createExpressApp", () => {
     const res = makeRes();
     await handler({ body: { severity: "bad" } }, res);
     expect(res.statusCode).toBe(400);
+  });
+
+  it("returns 502 when webhook send fails", async () => {
+    const channel: NotificationChannel = { name: "x", send: async () => { throw new Error("boom"); } };
+    const app = createExpressApp(channel);
+    const route = app._router.stack.find((l: any) => l.route?.path === "/webhook");
+    const handler = route.route.stack[0].handle;
+    const res = makeRes();
+    await handler({ body: { message: "hi" } }, res);
+    expect(res.statusCode).toBe(502);
+    expect(res.body).toMatchObject({ ok: false, error: "boom" });
+  });
+
+  it("stringifies non-error webhook failure", async () => {
+    const channel: NotificationChannel = { name: "x", send: (async () => { throw "boom"; }) as any };
+    const app = createExpressApp(channel);
+    const route = app._router.stack.find((l: any) => l.route?.path === "/webhook");
+    const handler = route.route.stack[0].handle;
+    const res = makeRes();
+    await handler({ body: { message: "hi" } }, res);
+    expect(res.statusCode).toBe(502);
+    expect(res.body).toMatchObject({ ok: false, error: "boom" });
   });
 });

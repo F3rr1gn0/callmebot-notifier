@@ -32,6 +32,14 @@ export interface NotificationResult {
   error?: string;
 }
 
+export interface NotificationMessagePayload {
+  title?: string;
+  message?: string;
+  severity?: NotificationSeverity;
+  source?: string;
+  [key: string]: unknown;
+}
+
 export interface NotificationChannel {
   name: string;
   send(message: string): Promise<void>;
@@ -50,6 +58,12 @@ export type NotifyResult = {
   attempts: NotifyAttempt[];
 };
 
+export type MessageFormatter = (payload: NotificationMessagePayload) => string;
+
+export type MessageInput = string | NotificationMessagePayload;
+
+export type MessageFormatPreset = "markdown" | "plain" | "json";
+
 export type RetryPolicy = {
   attempts: number;
   delayMs: number;
@@ -61,18 +75,12 @@ export type NotifyOptions = {
   primary?: NotificationChannel;
   fallback?: NotificationChannel;
   channels?: NotificationChannel[];
-  message: string;
+  message: MessageInput;
   retry?: RetryPolicy;
   reminderAfter?: ReminderAfter;
+  formatter?: MessageFormatter;
+  messageFormat?: MessageFormatPreset;
 };
-
-export interface WebhookPayload {
-  title?: string;
-  message?: string;
-  severity?: NotificationSeverity;
-  source?: string;
-  [key: string]: unknown;
-}
 
 export interface TelegramConfig {
   botToken: string;

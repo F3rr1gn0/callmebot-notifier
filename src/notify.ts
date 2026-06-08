@@ -1,6 +1,7 @@
 import type { NotifyOptions, NotifyResult, NotificationChannel } from "./types.js";
 import { ValidationError } from "./errors.js";
 import { sleep } from "./retry.js";
+import { resolveMessage } from "./format.js";
 
 const redactError = (error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
@@ -20,7 +21,8 @@ const toChannels = (options: NotifyOptions): NotificationChannel[] => {
 };
 
 export async function notify(options: NotifyOptions): Promise<NotifyResult> {
-  if (!options?.message?.trim()) throw new ValidationError("message is required");
+  const message = resolveMessage(options.message, options.formatter, options.messageFormat).trim();
+  if (!message) throw new ValidationError("message is required");
   const channels = toChannels(options);
   if (!channels.length) throw new ValidationError("at least one channel is required");
 
@@ -30,7 +32,7 @@ export async function notify(options: NotifyOptions): Promise<NotifyResult> {
   for (const channel of channels) {
     for (let attempt = 1; attempt <= retry.attempts; attempt += 1) {
       try {
-        await channel.send(options.message);
+        await channel.send(message);
         attempts.push({ channel: channel.name, ok: true, attempt });
         return { ok: true, deliveredBy: channel.name, attempts };
       } catch (error) {
