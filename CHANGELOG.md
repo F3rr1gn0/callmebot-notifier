@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.1
+
+-> Added `onResult` and `onError` hooks
+-> Added structured logs for delivery and failure paths
+-> Added explicit redaction in hook/log payloads
+-> Added tests for retry, fallback, and routing
+
 ## 1.5.0
 
 -> Added severity routing

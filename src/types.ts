@@ -81,6 +81,10 @@ export type NotifyOptions = {
   reminderAfter?: ReminderAfter;
   formatter?: MessageFormatter;
   messageFormat?: MessageFormatPreset;
+  logger?: LoggerLike;
+  logLevel?: LoggerLevel;
+  onResult?: (result: NotifyResult) => void | Promise<void>;
+  onError?: (error: unknown, context: { channel: string; attempt: number; message: string }) => void | Promise<void>;
 };
 
 export type NotifyTemplateInput = {

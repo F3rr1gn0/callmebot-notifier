@@ -146,4 +146,34 @@ describe("notify", () => {
     expect(result.ok).toBe(true);
     expect(channel.send).toHaveBeenCalledWith("*Incident*\nSeverity: critical\nSource: api\ndb down");
   });
+
+  it("calls onResult on success", async () => {
+    const onResult = vi.fn();
+    const logger = { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() };
+    const channel = { name: "a", send: vi.fn().mockResolvedValue(undefined) };
+
+    await notify({ channels: [channel], message: "token=secret", onResult, logger, logLevel: "info" });
+
+    expect(onResult).toHaveBeenCalledWith(expect.objectContaining({ ok: true, deliveredBy: "a" }));
+    expect(logger.info).toHaveBeenCalledWith("notify.delivered", expect.objectContaining({ message: "token=[redacted]" }));
+  });
+
+  it("calls onError on failure and logs structured data", async () => {
+    const onError = vi.fn();
+    const logger = { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() };
+    const channel = { name: "a", send: vi.fn().mockRejectedValue(new Error("apikey=secret")) };
+
+    const result = await notify({
+      channels: [channel],
+      message: "hello",
+      onError,
+      logger,
+      logLevel: "warn"
+    });
+
+    expect(result.ok).toBe(false);
+    expect(onError).toHaveBeenCalledWith(expect.any(Error), expect.objectContaining({ channel: "a", attempt: 1, message: "hello" }));
+    expect(logger.warn).toHaveBeenCalledWith("notify.failed", expect.objectContaining({ error: "apikey=[redacted]" }));
+    expect(logger.error).toHaveBeenCalledWith("notify.exhausted", expect.objectContaining({ attempts: 1 }));
+  });
 });

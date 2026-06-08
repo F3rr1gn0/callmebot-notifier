@@ -12,6 +12,8 @@ Includes:
 - Telegram, Email, Discord, Slack
 - `notify()` routing and fallback
 - `notify.alert()` and `notify.incident()`
+- `onResult` and `onError` hooks
+- structured logs
 - formatter presets
 - webhook formatting
 - Express integration
@@ -254,3 +256,23 @@ const summary = summarizeNotifyResult(result);
 - Intended for personal or low-risk alerts
 - Discord and Slack use webhook URLs only
 - `fromEnv()` is the quickest way to bootstrap a notifier from environment variables
+
+## Hooks
+
+```ts
+import { notify, whatsapp } from "callmebot-notifier";
+
+const channel = whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" });
+
+await notify({
+  channels: [channel],
+  message: "Release done",
+  logLevel: "info",
+  onResult: (result) => {
+    console.log("notify.result", result);
+  },
+  onError: (error, context) => {
+    console.error("notify.error", { error, ...context });
+  }
+});
+```

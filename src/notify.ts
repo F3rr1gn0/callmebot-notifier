@@ -2,6 +2,7 @@ import type { NotifyOptions, NotifyResult, NotificationChannel, NotificationSeve
 import { ValidationError } from "./errors.js";
 import { sleep } from "./retry.js";
 import { resolveMessage } from "./format.js";
+import { createLogger } from "./logger.js";
 
 const redactError = (error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
@@ -13,6 +14,14 @@ const redactError = (error: unknown) => {
     })
     .replace(/\b[A-Za-z0-9_\-]{24,}\b/g, "[redacted]");
 };
+
+const redactMessage = (message: string) =>
+  message
+    .replace(/([?&](?:apikey|token|pass|password|secret|key))=[^&\s]+/gi, "$1=[redacted]")
+    .replace(/\b(?:apikey|token|pass|password|secret|key)\s*[:=]\s*[^\s,;]+/gi, (match) => {
+      const [label] = match.split(/[:=]/, 1);
+      return `${label}=[redacted]`;
+    });
 
 const toChannels = (options: NotifyOptions, severity?: NotificationSeverity): NotificationChannel[] => {
   if (severity && options.routes?.[severity]?.length) return [...options.routes[severity]!];
@@ -30,21 +39,32 @@ async function notifyBase(options: NotifyOptions): Promise<NotifyResult> {
 
   const retry = options.retry ?? { attempts: 1, delayMs: 0 };
   const attempts: NotifyResult["attempts"] = [];
+  const logger = createLogger(options.logger ?? console, options.logLevel ?? "silent");
+  const safeMessage = redactMessage(message);
 
   for (const channel of channels) {
     for (let attempt = 1; attempt <= retry.attempts; attempt += 1) {
       try {
         await channel.send(message);
         attempts.push({ channel: channel.name, ok: true, attempt });
+        logger.info("notify.delivered", { channel: channel.name, attempt, message: safeMessage, severity });
+        const result = { ok: true, deliveredBy: channel.name, attempts };
+        await options.onResult?.(result);
         return { ok: true, deliveredBy: channel.name, attempts };
       } catch (error) {
-        attempts.push({ channel: channel.name, ok: false, attempt, error: redactError(error) });
+        const safeError = redactError(error);
+        attempts.push({ channel: channel.name, ok: false, attempt, error: safeError });
+        logger.warn("notify.failed", { channel: channel.name, attempt, error: safeError, message: safeMessage, severity });
+        await options.onError?.(error, { channel: channel.name, attempt, message: safeMessage });
         if (attempt < retry.attempts && retry.delayMs > 0) await sleep(retry.delayMs);
       }
     }
   }
 
-  return { ok: false, attempts };
+  const result = { ok: false, attempts };
+  logger.error("notify.exhausted", { message: safeMessage, severity, attempts: attempts.length });
+  await options.onResult?.(result);
+  return result;
 }
 
 const notifyWithTemplate = async (
