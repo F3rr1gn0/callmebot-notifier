@@ -1,10 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.6.0
 
 -> Added Google Chat and Microsoft Teams channels
 -> Added env bootstrap for Google Chat and Teams webhooks
--> Added severity-route examples for Google Chat and Teams
+-> Added docs for WhatsApp, Telegram, Discord, Slack, Google Chat, Teams, Gmail, and GitHub Actions
+-> Added setup docs and release prep for GitHub Action repo
 
 ## 1.5.2
 
