@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.2
+
+-> Added npm publish workflow with GitHub trusted publishing
+
 ## 1.6.1
 -> Added GitHub Action smoke workflow and Marketplace badge
 -> Added GitHub Action usage examples and failure alert flow
