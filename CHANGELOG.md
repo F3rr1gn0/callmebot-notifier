@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+-> Added GitHub Action smoke workflow and Marketplace badge
+-> Added GitHub Action usage examples and failure alert flow
+
 ## 1.6.0
 
 -> Added Google Chat and Microsoft Teams channels

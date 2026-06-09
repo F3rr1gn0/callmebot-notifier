@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/callmebot-notifier.svg?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/callmebot-notifier)
 [![coverage](https://img.shields.io/badge/coverage-99.78%25-brightgreen?style=for-the-badge)](./coverage/index.html)
 [![language](https://img.shields.io/badge/language-TypeScript-3178C6.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Marketplace](https://img.shields.io/badge/GitHub%20Marketplace-callmebot--notifier-blue?style=for-the-badge&logo=github)](https://github.com/marketplace/actions/callmebot-notifier)
 
 Send notifications from Node.js with one API and multiple delivery paths.
 
@@ -83,8 +84,83 @@ await notifier.send("Deployment done");
 - [Microsoft Teams webhook](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/teams-webhook.md)
 - [Email with Gmail](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/email-gmail.md)
 
-GitHub Action repo:
-- [callmebot-notifier-action](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier-action)
+## GitHub Action
+
+Use published action:
+
+```yaml
+- uses: F3rr1gn0/callmebot-notifier-action@v1
+  with:
+    message: "Build done"
+    channel: "telegram"
+  env:
+    TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+    TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+```
+
+Secrets to set in consumer repo:
+
+```text
+TELEGRAM_BOT_TOKEN
+TELEGRAM_CHAT_ID
+PHONE
+APIKEY
+DISCORD_WEBHOOK_URL
+SLACK_WEBHOOK_URL
+GCHAT_WEBHOOK_URL
+TEAMS_WEBHOOK_URL
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE
+SMTP_USER
+SMTP_PASS
+EMAIL_FROM
+EMAIL_TO
+```
+
+Smoke flow:
+
+```yaml
+name: smoke-action
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: F3rr1gn0/callmebot-notifier-action@v1
+        with:
+          message: "Smoke from GitHub Action"
+          channel: "telegram"
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+```
+
+Failure flow:
+
+```yaml
+name: smoke-action-failure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
+      - if: ${{ failure() }}
+        uses: F3rr1gn0/callmebot-notifier-action@v1
+        with:
+          message: "Build failed"
+          channel: "telegram"
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+```
 
 ## Usage
 
@@ -326,7 +402,6 @@ await notify({
 
 ## Future Integrations
 
-- GitHub Actions
 - Web Push
 - Pushover
 - Mattermost

@@ -1,0 +1,30 @@
+name: smoke-callmebot-action
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify via published action
+        uses: F3rr1gn0/callmebot-notifier-action@v1
+        with:
+          message: "Smoke from GitHub Action"
+          channel: "telegram"
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  failure-alert:
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 1
+      - if: ${{ failure() }}
+        name: Notify failure via published action
+        uses: F3rr1gn0/callmebot-notifier-action@v1
+        with:
+          message: "Smoke failed"
+          channel: "telegram"
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
