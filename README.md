@@ -31,23 +31,39 @@ npm install callmebot-notifier
 ## Quick Start
 
 ```env
+# WA
 PHONE=393331112223
 APIKEY=your-callmebot-apikey
-PORT=3000
-LOG_LEVEL=info
-TELEGRAM_BOT_TOKEN=
-TELEGRAM_CHAT_ID=
-DISCORD_WEBHOOK_URL=
-SLACK_WEBHOOK_URL=
-GCHAT_WEBHOOK_URL=
-TEAMS_WEBHOOK_URL=
-SMTP_HOST=
+
+# TELEGRAM
+TELEGRAM_BOT_TOKEN=1234567980:XXXX5x0XX2XxxXxx1XXXxxXxXXxXX6X-Tho
+TELEGRAM_CHAT_ID=990099009
+
+# DISCORD
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+
+# SLACK
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+
+# GOOGLE CHAT
+GCHAT_WEBHOOK_URL=https://chat.googleapis.com/v1/spaces/.../messages?key=...&token=...
+# OR
+# GOOGLE_CHAT_WEBHOOK_URL
+
+# TEAMS
+TEAMS_WEBHOOK_URL=https://...
+
+# EMAIL
+SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
-SMTP_USER=
-SMTP_PASS=
-EMAIL_FROM=
-EMAIL_TO=
+SMTP_USER=tuoindirizzo@gmail.com
+SMTP_PASS=xxxx xxxx xxxx xxxx
+EMAIL_FROM=tuoindirizzo@gmail.com
+EMAIL_TO=destinatario@dominio.com
+
+PORT=3000
+LOG_LEVEL=info
 ```
 
 ```ts
@@ -56,6 +72,19 @@ import { fromEnv } from "callmebot-notifier";
 const notifier = fromEnv();
 await notifier.send("Deployment done");
 ```
+
+## Setup Guides
+
+- [CallMeBot WhatsApp](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/callmebot-whatsapp.md)
+- [Telegram bot and chat](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/telegram-bot-chat.md)
+- [Discord webhook](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/discord-webhook.md)
+- [Slack webhook](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/slack-webhook.md)
+- [Google Chat webhook](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/google-chat-webhook.md)
+- [Microsoft Teams webhook](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/teams-webhook.md)
+- [Email with Gmail](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier/docs/setup/email-gmail.md)
+
+GitHub Action repo:
+- [callmebot-notifier-action](/Users/f3rr1gn0/Documents/myprj/callmebot-notifier-action)
 
 ## Usage
 
@@ -294,3 +323,20 @@ await notify({
   }
 });
 ```
+
+## Future Integrations
+
+- GitHub Actions
+- Web Push
+- Pushover
+- Mattermost
+- Matrix
+- SMS
+- Signal
+- Github Actions
+
+## Future MCP
+
+- MCP server for `notify`, `alert`, and `incident`
+- `testConnection` tool
+- `listChannels` tool
