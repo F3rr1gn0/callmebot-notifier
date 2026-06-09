@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.3
+
+-> README reworked
+
 ## 1.6.2
 
 -> Added npm publish workflow with GitHub trusted publishing
