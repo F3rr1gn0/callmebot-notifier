@@ -12,6 +12,8 @@ import { TelegramChannel } from "../src/channels/telegram.channel.js";
 import { EmailChannel } from "../src/channels/email.channel.js";
 import { DiscordChannel } from "../src/channels/discord.channel.js";
 import { SlackChannel } from "../src/channels/slack.channel.js";
+import { GChatChannel } from "../src/channels/gchat.channel.js";
+import { TeamsChannel } from "../src/channels/teams.channel.js";
 import { CallMeBotNotifier } from "../src/client.js";
 import { ValidationError } from "../src/errors.js";
 
@@ -94,11 +96,49 @@ describe("channels", () => {
     await expect(channel.send("hello")).rejects.toThrow("slack bad");
   });
 
+  it("sends gchat webhook", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" });
+    const channel = new GChatChannel({ webhookUrl: "https://example.com/gchat", fetch });
+    await expect(channel.send("hello")).resolves.toBeUndefined();
+    expect(fetch).toHaveBeenCalledWith("https://example.com/gchat", expect.objectContaining({
+      method: "POST"
+    }));
+  });
+
+  it("fails gchat webhook", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: false, text: async () => "gchat bad" });
+    const channel = new GChatChannel({ webhookUrl: "https://example.com/gchat", fetch });
+    await expect(channel.send("hello")).rejects.toThrow("gchat bad");
+  });
+
+  it("sends teams webhook", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" });
+    const channel = new TeamsChannel({ webhookUrl: "https://example.com/teams", fetch });
+    await expect(channel.send("hello")).resolves.toBeUndefined();
+    expect(fetch).toHaveBeenCalledWith("https://example.com/teams", expect.objectContaining({
+      method: "POST"
+    }));
+  });
+
+  it("fails teams webhook", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: false, text: async () => "teams bad" });
+    const channel = new TeamsChannel({ webhookUrl: "https://example.com/teams", fetch });
+    await expect(channel.send("hello")).rejects.toThrow("teams bad");
+  });
+
   it("validates discord config", () => {
     expect(() => new DiscordChannel({ webhookUrl: "" })).toThrow(ValidationError);
   });
 
   it("validates slack config", () => {
     expect(() => new SlackChannel({ webhookUrl: "" })).toThrow(ValidationError);
+  });
+
+  it("validates gchat config", () => {
+    expect(() => new GChatChannel({ webhookUrl: "" })).toThrow(ValidationError);
+  });
+
+  it("validates teams config", () => {
+    expect(() => new TeamsChannel({ webhookUrl: "" })).toThrow(ValidationError);
   });
 });

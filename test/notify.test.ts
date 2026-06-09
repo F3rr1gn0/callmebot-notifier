@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { notify } from "../src/notify.js";
-import { whatsapp, telegram, email } from "../src/channels/factories.js";
+import { whatsapp, telegram, email, gchat, teams } from "../src/channels/factories.js";
 
 describe("notify", () => {
   it("delivers through first channel", async () => {
@@ -123,6 +123,29 @@ describe("notify", () => {
     expect(result.deliveredBy).toBe("critical");
     expect(critical.send).toHaveBeenCalledWith("*CPU high*\nSeverity: critical\nload spike");
     expect(info.send).not.toHaveBeenCalled();
+  });
+
+  it("routes warn severity to gchat", async () => {
+    const warnFetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" });
+    const criticalFetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" });
+    const warn = gchat({ webhookUrl: "https://example.com/gchat", fetch: warnFetch });
+    const critical = teams({ webhookUrl: "https://example.com/teams", fetch: criticalFetch });
+
+    const result = await notify({
+      routes: {
+        warn: [warn],
+        critical: [critical]
+      },
+      message: {
+        title: "Latency spike",
+        message: "warn path",
+        severity: "warn"
+      }
+    });
+
+    expect(result.deliveredBy).toBe("gchat");
+    expect(warnFetch).toHaveBeenCalledWith("https://example.com/gchat", expect.objectContaining({ method: "POST" }));
+    expect(criticalFetch).not.toHaveBeenCalled();
   });
 
   it("supports alert template helper", async () => {

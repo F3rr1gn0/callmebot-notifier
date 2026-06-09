@@ -124,3 +124,13 @@ export interface SlackConfig {
   iconEmoji?: string;
   fetch?: typeof fetch;
 }
+
+export interface GChatConfig {
+  webhookUrl: string;
+  fetch?: typeof fetch;
+}
+
+export interface TeamsConfig {
+  webhookUrl: string;
+  fetch?: typeof fetch;
+}

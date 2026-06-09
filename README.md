@@ -1,15 +1,15 @@
 # callmebot-notifier
 
-[![npm version](https://img.shields.io/npm/v/callmebot-notifier.svg)](https://www.npmjs.com/package/callmebot-notifier)
-[![coverage](https://img.shields.io/badge/coverage-99.78%25-brightgreen)](./coverage/index.html)
-[![language](https://img.shields.io/badge/language-TypeScript-3178C6.svg)](https://www.typescriptlang.org/)
+[![npm version](https://img.shields.io/npm/v/callmebot-notifier.svg?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/callmebot-notifier)
+[![coverage](https://img.shields.io/badge/coverage-99.78%25-brightgreen?style=for-the-badge)](./coverage/index.html)
+[![language](https://img.shields.io/badge/language-TypeScript-3178C6.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 
 Send notifications from Node.js with one API and multiple delivery paths.
 
 Includes:
 
 - WhatsApp via CallMeBot
-- Telegram, Email, Discord, Slack
+- Telegram, Email, Discord, Slack, Google Chat, Microsoft Teams
 - `notify()` routing and fallback
 - `notify.alert()` and `notify.incident()`
 - `onResult` and `onError` hooks
@@ -39,6 +39,8 @@ TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 DISCORD_WEBHOOK_URL=
 SLACK_WEBHOOK_URL=
+GCHAT_WEBHOOK_URL=
+TEAMS_WEBHOOK_URL=
 SMTP_HOST=
 SMTP_PORT=587
 SMTP_SECURE=false
@@ -85,16 +87,32 @@ await notify({
 });
 ```
 
+```ts
+import { gchat, teams, notify } from "callmebot-notifier";
+
+await notify({
+  channels: [
+    gchat({ webhookUrl: process.env.GCHAT_WEBHOOK_URL ?? "" }),
+    teams({ webhookUrl: process.env.TEAMS_WEBHOOK_URL ?? "" })
+  ],
+  message: "Build done"
+});
+```
+
 ## Severity Routing
 
 ```ts
-import { notify, whatsapp, telegram, email } from "callmebot-notifier";
+import { notify, whatsapp, telegram, email, gchat, teams } from "callmebot-notifier";
 
 await notify({
   routes: {
     info: [telegram({ botToken: process.env.TELEGRAM_BOT_TOKEN ?? "", chatId: process.env.TELEGRAM_CHAT_ID ?? "" })],
+    warn: [
+      gchat({ webhookUrl: process.env.GCHAT_WEBHOOK_URL ?? "" })
+    ],
     critical: [
       whatsapp({ phone: process.env.PHONE ?? "", apikey: process.env.APIKEY ?? "" }),
+      teams({ webhookUrl: process.env.TEAMS_WEBHOOK_URL ?? "" }),
       email({
         host: process.env.SMTP_HOST ?? "",
         port: Number(process.env.SMTP_PORT || 587),

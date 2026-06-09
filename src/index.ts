@@ -11,6 +11,8 @@ export * from "./channels/telegram.channel.js";
 export * from "./channels/email.channel.js";
 export * from "./channels/discord.channel.js";
 export * from "./channels/slack.channel.js";
+export * from "./channels/gchat.channel.js";
+export * from "./channels/teams.channel.js";
 export * from "./channels/fallback.channel.js";
 export * from "./channels/factories.js";
 export * from "./env.js";
