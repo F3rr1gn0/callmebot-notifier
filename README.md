@@ -12,6 +12,13 @@ Multi-channel notification delivery for Node.js. Send alerts to WhatsApp, Telegr
 
 CallMeBot is not the official WhatsApp API. Use this package for personal and low-risk notifications.
 
+## Donation:
+
+You can buy me a coffee or two if you find helpfull my node.
+
+If you buy me a coffee I would like to thank you in advance for your donation.
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg?style=for-the-badge&logo=PayPal)](https://www.paypal.com/paypalme/f3rr1gn0)
+
 ## Supported Channels
 
 - WhatsApp via CallMeBot
