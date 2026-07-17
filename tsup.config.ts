@@ -11,5 +11,5 @@ export default defineConfig({
   platform: "node",
   splitting: false,
   bundle: true,
-  external: ["express", "nodemailer", "zod"]
+  external: ["express", "nodemailer", "web-push", "zod"]
 });

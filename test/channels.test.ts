@@ -1,10 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 
-const sendMail = vi.fn().mockResolvedValue({});
+const { sendMail, sendNotification } = vi.hoisted(() => ({
+  sendMail: vi.fn().mockResolvedValue({}),
+  sendNotification: vi.fn().mockResolvedValue({})
+}));
 vi.mock("nodemailer", () => ({
   default: {
     createTransport: () => ({ sendMail })
   }
+}));
+vi.mock("web-push", () => ({
+  default: { sendNotification }
 }));
 
 import { CallMeBotChannel } from "../src/channels/callmebot.channel.js";
@@ -14,6 +20,7 @@ import { DiscordChannel } from "../src/channels/discord.channel.js";
 import { SlackChannel } from "../src/channels/slack.channel.js";
 import { GChatChannel } from "../src/channels/gchat.channel.js";
 import { TeamsChannel } from "../src/channels/teams.channel.js";
+import { WebPushChannel } from "../src/channels/web-push.channel.js";
 import { CallMeBotNotifier } from "../src/client.js";
 import { ValidationError } from "../src/errors.js";
 
@@ -140,5 +147,85 @@ describe("channels", () => {
 
   it("validates teams config", () => {
     expect(() => new TeamsChannel({ webhookUrl: "" })).toThrow(ValidationError);
+  });
+
+  it("sends web push notification with VAPID details", async () => {
+    const subscription = {
+      endpoint: "https://push.example.test/subscription",
+      expirationTime: null,
+      keys: { auth: "auth-key", p256dh: "public-key" }
+    };
+    const channel = new WebPushChannel({
+      subscription,
+      vapidDetails: {
+        subject: "mailto:alerts@example.com",
+        publicKey: "vapid-public-key",
+        privateKey: "vapid-private-key"
+      },
+      ttl: 60,
+      timeoutMs: 5000,
+      urgency: "high",
+      topic: "deploy"
+    });
+
+    await expect(channel.send("Deployment complete")).resolves.toBeUndefined();
+    expect(sendNotification).toHaveBeenCalledWith(subscription, "Deployment complete", {
+      vapidDetails: {
+        subject: "mailto:alerts@example.com",
+        publicKey: "vapid-public-key",
+        privateKey: "vapid-private-key"
+      },
+      TTL: 60,
+      timeout: 5000,
+      urgency: "high",
+      topic: "deploy"
+    });
+  });
+
+  it("validates web push config", () => {
+    const vapidDetails = {
+      subject: "mailto:alerts@example.com",
+      publicKey: "vapid-public-key",
+      privateKey: "vapid-private-key"
+    };
+    const subscription = {
+      endpoint: "https://push.example.test/subscription",
+      keys: { auth: "auth-key", p256dh: "public-key" }
+    };
+
+    expect(() => new WebPushChannel({ ...subscription, vapidDetails } as never)).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails: { ...vapidDetails, subject: "" } })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails: { ...vapidDetails, publicKey: "" } })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails: { ...vapidDetails, privateKey: "" } })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({
+      subscription: { ...subscription, endpoint: "http://push.example.test/subscription" },
+      vapidDetails
+    })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({
+      subscription: { ...subscription, keys: { ...subscription.keys, auth: "" } },
+      vapidDetails
+    })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails, ttl: -1 })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails, timeoutMs: 0 })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails, contentEncoding: "invalid" as never })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails, urgency: "invalid" as never })).toThrow(ValidationError);
+    expect(() => new WebPushChannel({ subscription, vapidDetails, topic: "invalid topic" })).toThrow(ValidationError);
+  });
+
+  it("propagates web push service errors", async () => {
+    sendNotification.mockRejectedValueOnce(new Error("subscription expired"));
+    const channel = new WebPushChannel({
+      subscription: {
+        endpoint: "https://push.example.test/subscription",
+        keys: { auth: "auth-key", p256dh: "public-key" }
+      },
+      vapidDetails: {
+        subject: "mailto:alerts@example.com",
+        publicKey: "vapid-public-key",
+        privateKey: "vapid-private-key"
+      }
+    });
+
+    await expect(channel.send("hello")).rejects.toThrow("subscription expired");
   });
 });

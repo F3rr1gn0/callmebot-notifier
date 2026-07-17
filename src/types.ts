@@ -134,3 +134,28 @@ export interface TeamsConfig {
   webhookUrl: string;
   fetch?: typeof fetch;
 }
+
+export type WebPushSubscription = {
+  endpoint: string;
+  expirationTime?: number | null;
+  keys: {
+    auth: string;
+    p256dh: string;
+  };
+};
+
+export type WebPushVapidDetails = {
+  subject: string;
+  publicKey: string;
+  privateKey: string;
+};
+
+export interface WebPushConfig {
+  subscription: WebPushSubscription;
+  vapidDetails: WebPushVapidDetails;
+  ttl?: number;
+  timeoutMs?: number;
+  contentEncoding?: "aesgcm" | "aes128gcm";
+  urgency?: "very-low" | "low" | "normal" | "high";
+  topic?: string;
+}
