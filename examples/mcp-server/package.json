@@ -1,0 +1,14 @@
+{
+  "name": "callmebot-notifier-mcp-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx server.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "callmebot-notifier": "^1.8.1",
+    "tsx": "^4.22.3",
+    "zod": "^3.24.1"
+  }
+}

@@ -61,6 +61,7 @@
     "body-parser": "1.20.6"
   },
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.29",
     "@types/nodemailer": "^6.4.17",

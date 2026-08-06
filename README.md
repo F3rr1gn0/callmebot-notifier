@@ -355,6 +355,12 @@ jobs:
 - [Microsoft Teams webhook](./docs/setup/teams-webhook.md)
 - [Email with Gmail](./docs/setup/email-gmail.md)
 
+## MCP Server Example
+
+Expose `send_notification` to Claude Desktop, Cursor, or another MCP client:
+
+- [MCP server example](./examples/mcp-server/README.md)
+
 ## Environment Variables
 
 Common variables:
