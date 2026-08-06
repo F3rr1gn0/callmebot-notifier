@@ -29,6 +29,7 @@ If you buy me a coffee I would like to thank you in advance for your donation.
 - Slack
 - Google Chat
 - Microsoft Teams
+- Signal (via `signal-cli-rest-api`)
 
 ## Features
 
@@ -41,6 +42,7 @@ If you buy me a coffee I would like to thank you in advance for your donation.
 | Slack                  | Yes       |
 | Google Chat            | Yes       |
 | Microsoft Teams        | Yes       |
+| Signal via signal-cli  | Yes       |
 | Email                  | Yes       |
 | Retry                  | Yes       |
 | Fallback               | Yes       |
@@ -66,6 +68,9 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 GCHAT_WEBHOOK_URL=https://chat.googleapis.com/v1/spaces/.../messages?key=...&token=...
 TEAMS_WEBHOOK_URL=https://...
+SIGNAL_API_URL=http://localhost:8080
+SIGNAL_NUMBER=+391234567890
+SIGNAL_RECIPIENTS=+399876543210
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
@@ -353,6 +358,7 @@ jobs:
 - [Slack webhook](./docs/setup/slack-webhook.md)
 - [Google Chat webhook](./docs/setup/google-chat-webhook.md)
 - [Microsoft Teams webhook](./docs/setup/teams-webhook.md)
+- [Signal](./docs/setup/signal.md)
 - [Email with Gmail](./docs/setup/email-gmail.md)
 
 ## MCP Server Example
@@ -375,6 +381,9 @@ Common variables:
 - `SLACK_WEBHOOK_URL`
 - `GCHAT_WEBHOOK_URL`
 - `TEAMS_WEBHOOK_URL`
+- `SIGNAL_API_URL`
+- `SIGNAL_NUMBER`
+- `SIGNAL_RECIPIENTS`
 - `SMTP_HOST`
 - `SMTP_PORT`
 - `SMTP_SECURE`
@@ -423,7 +432,6 @@ const summary = summarizeNotifyResult(result);
 - Pushover
 - Mattermost
 - Matrix
-- Signal
 
 ## License
 

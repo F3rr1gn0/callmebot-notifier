@@ -135,6 +135,13 @@ export interface TeamsConfig {
   fetch?: typeof fetch;
 }
 
+export interface SignalConfig {
+  number: string;
+  recipients: string[];
+  baseUrl?: string;
+  fetch?: typeof fetch;
+}
+
 export type WebPushSubscription = {
   endpoint: string;
   expirationTime?: number | null;

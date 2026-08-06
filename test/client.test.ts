@@ -46,7 +46,7 @@ describe("CallMeBotNotifier", () => {
 
 describe("fromEnv", () => {
   it("creates a fallback channel from env", () => {
-    const channel = fromEnv({
+  const channel = fromEnv({
       env: {
         PHONE: "123",
         APIKEY: "key"
@@ -82,6 +82,18 @@ describe("fromEnv", () => {
         EMAIL_TO: "to@example.com",
         DISCORD_WEBHOOK_URL: "https://example.com/discord",
         SLACK_WEBHOOK_URL: "https://example.com/slack"
+      } as NodeJS.ProcessEnv
+    });
+
+    expect(channel.name).toBe("fallback");
+  });
+
+  it("creates a signal channel from env", () => {
+    const channel = fromEnv({
+      env: {
+        SIGNAL_API_URL: "http://signal:8080",
+        SIGNAL_NUMBER: "+391234567890",
+        SIGNAL_RECIPIENTS: "+399876543210, +391112223333"
       } as NodeJS.ProcessEnv
     });
 

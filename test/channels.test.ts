@@ -21,6 +21,7 @@ import { SlackChannel } from "../src/channels/slack.channel.js";
 import { GChatChannel } from "../src/channels/gchat.channel.js";
 import { TeamsChannel } from "../src/channels/teams.channel.js";
 import { WebPushChannel } from "../src/channels/web-push.channel.js";
+import { SignalChannel } from "../src/channels/signal.channel.js";
 import { CallMeBotNotifier } from "../src/client.js";
 import { ValidationError } from "../src/errors.js";
 
@@ -133,6 +134,31 @@ describe("channels", () => {
     await expect(channel.send("hello")).rejects.toThrow("teams bad");
   });
 
+  it("sends signal through signal-cli-rest-api", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "ok" });
+    const channel = new SignalChannel({
+      number: "+391234567890",
+      recipients: ["+399876543210"],
+      baseUrl: "http://signal:8080",
+      fetch
+    });
+    await expect(channel.send("hello")).resolves.toBeUndefined();
+    expect(fetch).toHaveBeenCalledWith("http://signal:8080/v2/send", expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify({
+        message: "hello",
+        number: "+391234567890",
+        recipients: ["+399876543210"]
+      })
+    }));
+  });
+
+  it("fails signal on API error", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: false, text: async () => "signal bad" });
+    const channel = new SignalChannel({ number: "+391234567890", recipients: ["+399876543210"], fetch });
+    await expect(channel.send("hello")).rejects.toThrow("signal bad");
+  });
+
   it("validates discord config", () => {
     expect(() => new DiscordChannel({ webhookUrl: "" })).toThrow(ValidationError);
   });
@@ -147,6 +173,12 @@ describe("channels", () => {
 
   it("validates teams config", () => {
     expect(() => new TeamsChannel({ webhookUrl: "" })).toThrow(ValidationError);
+  });
+
+  it("validates signal config", () => {
+    expect(() => new SignalChannel({ number: "", recipients: ["+391234567890"] })).toThrow(ValidationError);
+    expect(() => new SignalChannel({ number: "+391234567890", recipients: [] })).toThrow(ValidationError);
+    expect(() => new SignalChannel({ number: "+391234567890", recipients: [""] })).toThrow(ValidationError);
   });
 
   it("sends web push notification with VAPID details", async () => {

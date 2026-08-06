@@ -7,6 +7,7 @@ import { GChatChannel } from "./gchat.channel.js";
 import { TeamsChannel } from "./teams.channel.js";
 import { WebPushChannel } from "./web-push.channel.js";
 import { CallMeBotChannel } from "./callmebot.channel.js";
+import { SignalChannel } from "./signal.channel.js";
 import type {
   CallMeBotConfig,
   DiscordConfig,
@@ -16,7 +17,8 @@ import type {
   SlackConfig,
   TeamsConfig,
   TelegramConfig,
-  WebPushConfig
+  WebPushConfig,
+  SignalConfig
 } from "../types.js";
 
 export const whatsapp = (config: CallMeBotConfig): NotificationChannel =>
@@ -35,3 +37,5 @@ export const gchat = (config: GChatConfig): NotificationChannel => new GChatChan
 export const teams = (config: TeamsConfig): NotificationChannel => new TeamsChannel(config);
 
 export const webpush = (config: WebPushConfig): NotificationChannel => new WebPushChannel(config);
+
+export const signal = (config: SignalConfig): NotificationChannel => new SignalChannel(config);

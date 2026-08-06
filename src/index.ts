@@ -14,6 +14,7 @@ export * from "./channels/slack.channel.js";
 export * from "./channels/gchat.channel.js";
 export * from "./channels/teams.channel.js";
 export * from "./channels/web-push.channel.js";
+export * from "./channels/signal.channel.js";
 export * from "./channels/fallback.channel.js";
 export * from "./channels/factories.js";
 export * from "./env.js";

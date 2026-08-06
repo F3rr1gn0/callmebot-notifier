@@ -1,7 +1,7 @@
 {
   "name": "callmebot-notifier",
   "version": "1.8.1",
-  "description": "Typed notification library for Node.js with WhatsApp, Telegram, Email, Discord, Slack, Google Chat, and Microsoft Teams.",
+  "description": "Typed notification library for Node.js with WhatsApp, Telegram, Signal, Email, Discord, Slack, Google Chat, and Microsoft Teams.",
   "license": "MIT",
   "author": "F3rr1gn0",
   "type": "module",
@@ -27,6 +27,8 @@
     "google chat",
     "googlechat",
     "teams",
+    "signal",
+    "signal-cli-rest-api",
     "express",
     "typescript"
   ],

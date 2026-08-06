@@ -8,6 +8,7 @@ import { SlackChannel } from "./channels/slack.channel.js";
 import { GChatChannel } from "./channels/gchat.channel.js";
 import { TeamsChannel } from "./channels/teams.channel.js";
 import { FallbackChannel } from "./channels/fallback.channel.js";
+import { SignalChannel } from "./channels/signal.channel.js";
 import type { EmailConfig, GChatConfig, NotificationChannel, TeamsConfig, TelegramConfig } from "./types.js";
 
 const missing = (name: string) => new ValidationError(`Missing env ${name}`);
@@ -82,9 +83,23 @@ export function fromEnv(options: FromEnvOptions = {}) {
     channels.push(new TeamsChannel(config));
   }
 
+  const signalNumber = maybe(env.SIGNAL_NUMBER);
+  const signalRecipients = maybe(env.SIGNAL_RECIPIENTS);
+  if (signalNumber || signalRecipients) {
+    if (!signalNumber) throw missing("SIGNAL_NUMBER");
+    if (!signalRecipients) throw missing("SIGNAL_RECIPIENTS");
+    const recipients = signalRecipients.split(",").map((recipient) => recipient.trim()).filter(Boolean);
+    if (!recipients.length) throw missing("SIGNAL_RECIPIENTS");
+    channels.push(new SignalChannel({
+      number: signalNumber,
+      recipients,
+      baseUrl: maybe(env.SIGNAL_API_URL)
+    }));
+  }
+
   if (!channels.length) {
     throw new ValidationError(
-      "No channels configured. Set PHONE/APIKEY, TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID, SMTP_*, DISCORD_WEBHOOK_URL, SLACK_WEBHOOK_URL, GCHAT_WEBHOOK_URL, or TEAMS_WEBHOOK_URL."
+      "No channels configured. Set PHONE/APIKEY, TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID, SMTP_*, DISCORD_WEBHOOK_URL, SLACK_WEBHOOK_URL, GCHAT_WEBHOOK_URL, TEAMS_WEBHOOK_URL, or SIGNAL_NUMBER/SIGNAL_RECIPIENTS."
     );
   }
 

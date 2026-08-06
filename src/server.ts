@@ -4,6 +4,7 @@ import { TelegramChannel } from "./channels/telegram.channel.js";
 import { EmailChannel } from "./channels/email.channel.js";
 import { DiscordChannel } from "./channels/discord.channel.js";
 import { SlackChannel } from "./channels/slack.channel.js";
+import { SignalChannel } from "./channels/signal.channel.js";
 import { FallbackChannel } from "./channels/fallback.channel.js";
 import { createExpressApp } from "./integrations/express.js";
 import type { NotificationChannel } from "./types.js";
@@ -14,6 +15,8 @@ const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN ?? "";
 const telegramChatId = process.env.TELEGRAM_CHAT_ID ?? "";
 const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL ?? "";
 const slackWebhookUrl = process.env.SLACK_WEBHOOK_URL ?? "";
+const signalNumber = process.env.SIGNAL_NUMBER ?? "";
+const signalRecipients = (process.env.SIGNAL_RECIPIENTS ?? "").split(",").map((recipient) => recipient.trim()).filter(Boolean);
 
 const channels: NotificationChannel[] = [];
 if (phone && apikey) {
@@ -37,6 +40,13 @@ if (process.env.SMTP_HOST && process.env.EMAIL_FROM && process.env.EMAIL_TO) {
 }
 if (discordWebhookUrl) channels.push(new DiscordChannel({ webhookUrl: discordWebhookUrl }));
 if (slackWebhookUrl) channels.push(new SlackChannel({ webhookUrl: slackWebhookUrl }));
+if (signalNumber && signalRecipients.length) {
+  channels.push(new SignalChannel({
+    number: signalNumber,
+    recipients: signalRecipients,
+    baseUrl: process.env.SIGNAL_API_URL
+  }));
+}
 
 const app = createExpressApp(new FallbackChannel(channels));
 const port = Number(process.env.PORT ?? 3000);
