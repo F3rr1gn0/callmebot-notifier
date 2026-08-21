@@ -1,8 +1,15 @@
 import { readFile } from "node:fs/promises";
-import { describe, expect, it, vi } from "vitest";
-import * as root from "callmebot-notifier";
-import * as whatsappEntry from "callmebot-notifier/whatsapp";
-import * as telegramEntry from "callmebot-notifier/telegram";
+import { beforeAll, describe, expect, it, vi } from "vitest";
+
+let root: typeof import("callmebot-notifier");
+let whatsappEntry: typeof import("callmebot-notifier/whatsapp");
+let telegramEntry: typeof import("callmebot-notifier/telegram");
+
+beforeAll(async () => {
+  root = await import(/* @vite-ignore */ "callmebot-notifier");
+  whatsappEntry = await import(/* @vite-ignore */ "callmebot-notifier/whatsapp");
+  telegramEntry = await import(/* @vite-ignore */ "callmebot-notifier/telegram");
+});
 
 describe("built package exports", () => {
   it("keeps historical root exports", () => {

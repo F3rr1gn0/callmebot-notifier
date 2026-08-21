@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.2
+
+-> Fixed package export smoke test resolution in CI
+
 ## 1.10.1
 
 -> Fixed publish workflow build order
