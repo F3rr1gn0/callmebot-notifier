@@ -82,7 +82,9 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx examples/express/server.ts",
+    "pretest": "npm run build",
     "test": "vitest run",
+    "pretest:coverage": "npm run build",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
