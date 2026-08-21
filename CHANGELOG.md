@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.10.0
+
+-> Added subpath exports
+-> Added Cloudflare Workers-compatible WhatsApp and Telegram entrypoints
+-> Isolated Node-specific integrations
+-> Preserved root import backward compatibility
+
 ## 1.6.3
 
 -> README reworked

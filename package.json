@@ -1,6 +1,6 @@
 {
   "name": "callmebot-notifier",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Typed notification library for Node.js with WhatsApp, Telegram, Signal, Email, Discord, Slack, Google Chat, and Microsoft Teams.",
   "license": "MIT",
   "author": "F3rr1gn0",
@@ -37,6 +37,41 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs"
+    },
+    "./whatsapp": {
+      "types": "./dist/whatsapp.d.ts",
+      "import": "./dist/whatsapp.js",
+      "require": "./dist/whatsapp.cjs"
+    },
+    "./telegram": {
+      "types": "./dist/telegram.d.ts",
+      "import": "./dist/telegram.js",
+      "require": "./dist/telegram.cjs"
+    },
+    "./email": {
+      "types": "./dist/email.d.ts",
+      "import": "./dist/email.js",
+      "require": "./dist/email.cjs"
+    },
+    "./webpush": {
+      "types": "./dist/webpush.d.ts",
+      "import": "./dist/webpush.js",
+      "require": "./dist/webpush.cjs"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "import": "./dist/express.js",
+      "require": "./dist/express.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
     }
   },
   "files": [
@@ -60,7 +95,8 @@
     "zod": "^3.24.1"
   },
   "overrides": {
-    "body-parser": "1.20.6"
+    "body-parser": "1.20.6",
+    "esbuild": "^0.28.1"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

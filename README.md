@@ -12,6 +12,34 @@ Multi-channel notification delivery for Node.js. Send alerts to WhatsApp, Telegr
 
 CallMeBot is not the official WhatsApp API. Use this package for personal and low-risk notifications.
 
+## Subpath imports
+
+Use HTTP-only entrypoints for Cloudflare Workers, edge runtimes, and serverless environments:
+
+```ts
+import { whatsapp } from "callmebot-notifier/whatsapp";
+import { telegram } from "callmebot-notifier/telegram";
+```
+
+```ts
+import { telegram } from "callmebot-notifier/telegram";
+
+export default {
+  async fetch(_request: Request, env: { TELEGRAM_BOT_TOKEN: string; TELEGRAM_CHAT_ID: string }) {
+    const channel = telegram({
+      botToken: env.TELEGRAM_BOT_TOKEN,
+      chatId: env.TELEGRAM_CHAT_ID
+    });
+    await channel.send("Hello from Cloudflare Workers");
+    return new Response("sent");
+  }
+};
+```
+
+Additional entrypoints are available from `callmebot-notifier/core`, `/email`, `/webpush`, and `/express`.
+The `email`, `webpush`, and `express` entrypoints are Node-specific.
+The root import remains fully supported for backward compatibility.
+
 ## Donation:
 
 You can buy me a coffee or two if you find helpfull my node.
@@ -429,6 +457,7 @@ const summary = summarizeNotifyResult(result);
 
 ## Roadmap
 
+- ntfy
 - Pushover
 - Mattermost
 - Matrix
