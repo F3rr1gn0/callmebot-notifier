@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.1
+
+-> Fixed publish workflow build order
+
 ## 1.10.0
 
 -> Added subpath exports
