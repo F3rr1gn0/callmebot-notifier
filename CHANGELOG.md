@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.1
+
+- Security patch: resolved `cookie` and `qs` vulnerabilities, including low severity findings.
+
 ## 1.11.0
 
 - Added Unix-friendly CLI with persistent config, stdin, fallback, severity, retry, JSON, and quiet modes.
