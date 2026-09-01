@@ -4,6 +4,7 @@
 
 - Added Unix-friendly CLI with persistent config, stdin, fallback, severity, retry, JSON, and quiet modes.
 - Added persistent severity routes and Homebrew readiness documentation.
+- Resolved Express transitive `cookie` and `qs` vulnerabilities, including low severity findings.
 
 ## 1.10.2
 

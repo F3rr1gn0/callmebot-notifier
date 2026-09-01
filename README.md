@@ -87,6 +87,12 @@ npm install callmebot-notifier
 
 ## CLI
 
+```text
+=====================================
+        CALLMEBOT-NOTIFIER
+=====================================
+```
+
 Install globally, then use the short alias `cmb-notify` (canonical command: `callmebot-notifier`):
 
 ```bash

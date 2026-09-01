@@ -52,7 +52,10 @@ export function parseArgs(argv: string[]): CliOptions & { command?: "channels" |
   return { command, channel: values.channel, fallback: values.fallback?.split(",").map((v) => v.trim()).filter(Boolean), title: values.title, severity, retryAttempts, retryDelay, quiet, json, debug, help, version, message };
 }
 
-export const helpText = `Usage:
+export const banner = `=====================================\n        CALLMEBOT-NOTIFIER\n=====================================`;
+
+export const helpText = `${banner}
+Usage:
   cmb-notify "Backup completed"
   cmb-notify --channel telegram "Deploy completed"
   cmb-notify --severity critical "Server down"
