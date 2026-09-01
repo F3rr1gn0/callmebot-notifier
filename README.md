@@ -85,6 +85,56 @@ If you buy me a coffee I would like to thank you in advance for your donation.
 npm install callmebot-notifier
 ```
 
+## CLI
+
+Install globally, then use the short alias `cmb-notify` (canonical command: `callmebot-notifier`):
+
+```bash
+npm install -g callmebot-notifier
+cmb-notify --help
+cmb-notify "Hello"
+callmebot-notifier "Hello"
+```
+
+The name `notify` is intentionally not installed because it conflicts with an existing Homebrew formula and executable.
+
+Useful commands:
+
+```bash
+cmb-notify channels
+cmb-notify test --channel telegram
+cmb-notify --channel telegram --fallback whatsapp,email "Server down"
+cmb-notify --json --channel telegram "Deploy completed"
+cmb-notify config
+cmb-notify config get channels.telegram.chatId
+cmb-notify config unset channels.telegram.botToken
+```
+
+WhatsApp setup:
+
+```bash
+cmb-notify config set channels.whatsapp.phone "39333..."
+cmb-notify config set channels.whatsapp.apikey "$APIKEY"
+cmb-notify --channel whatsapp "Backup completed"
+```
+
+```bash
+# Telegram
+cmb-notify config set channels.telegram.botToken "$TOKEN"
+cmb-notify config set channels.telegram.chatId "$CHAT_ID"
+cmb-notify config default telegram
+cmb-notify "Deploy completed"
+
+# Other Unix-friendly forms
+echo "Backup completed" | cmb-notify
+mysqldump ... && cmb-notify "DB backup completed"
+docker compose up -d && cmb-notify "Containers started"
+curl -fsS https://example.com/health || cmb-notify --severity critical "API DOWN"
+ssh my-server 'deploy.sh' && cmb-notify "Remote deploy completed"
+```
+
+Use `--channel`, `--fallback channel1,channel2`, `--title`, `--severity info|warn|error|critical`, `--retry-attempts`, `--retry-delay`, `--quiet`, or `--json`. Explicit channel flags override environment and config; environment variables override persistent config. With no selection, a persistent default is used, then a single configured channel; multiple configured channels require `config default`. Optional `routes` config maps severities to ordered channel names. Web Push remains library-only/advanced in the CLI.
+
 ## Quick Start
 
 ```env

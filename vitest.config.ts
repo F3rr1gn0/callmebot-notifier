@@ -15,7 +15,9 @@ export default defineConfig({
         "vitest.config.ts",
         "src/index.ts",
         "src/server.ts",
-        "src/types.ts"
+        "src/types.ts",
+        "src/cli.ts",
+        "src/cli/run.ts"
       ],
       thresholds: {
         lines: 80,

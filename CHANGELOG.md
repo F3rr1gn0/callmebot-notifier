@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.0
+
+- Added Unix-friendly CLI with persistent config, stdin, fallback, severity, retry, JSON, and quiet modes.
+- Added persistent severity routes and Homebrew readiness documentation.
+
 ## 1.10.2
 
 -> Fixed package export smoke test resolution in CI
@@ -83,3 +88,7 @@
 ## 1.0.0
 
 -> Initial release
+## Unreleased
+
+- Added Unix-friendly `callmebot-notifier` / `cmb-notify` CLI with stdin, JSON output, persistent config, fallback, severity, and retry flags.
+- Added Homebrew readiness documentation.

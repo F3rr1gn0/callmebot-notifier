@@ -9,7 +9,8 @@ export default defineConfig({
     email: "src/email.ts",
     webpush: "src/webpush.ts",
     express: "src/express.ts",
-    server: "src/server.ts"
+    server: "src/server.ts",
+    cli: "src/cli.ts"
   },
   format: ["esm", "cjs"],
   dts: true,

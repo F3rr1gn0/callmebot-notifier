@@ -1,6 +1,6 @@
 {
   "name": "callmebot-notifier",
-  "version": "1.10.2",
+  "version": "1.11.0",
   "description": "Typed notification library for Node.js with WhatsApp, Telegram, Signal, Email, Discord, Slack, Google Chat, and Microsoft Teams.",
   "license": "MIT",
   "author": "F3rr1gn0",
@@ -8,6 +8,10 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "callmebot-notifier": "./dist/cli.js",
+    "cmb-notify": "./dist/cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/F3rr1gn0/callmebot-notifier.git"

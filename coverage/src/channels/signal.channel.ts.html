@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/channels/telegram.channel.ts</title>
+    <title>Code coverage report for src/channels/signal.channel.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,20 +19,20 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/channels</a> telegram.channel.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/channels</a> signal.channel.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>21/21</span>
+                <span class='fraction'>28/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">92.3% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>12/13</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>21/21</span>
+                <span class='fraction'>28/28</span>
             </div>
         
             
@@ -88,7 +88,14 @@
 <a name='L23'></a><a href='#L23'>23</a>
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
-<a name='L26'></a><a href='#L26'>26</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -99,7 +106,9 @@
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -112,28 +121,40 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { NotificationChannel, TelegramConfig } from "../types.js";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { NotificationChannel, SignalConfig } from "../types.js";
 import { ValidationError } from "../errors.js";
 &nbsp;
-export class TelegramChannel implements NotificationChannel {
-  readonly name = "telegram";
+export class SignalChannel implements NotificationChannel {
+  readonly name = "signal";
   private readonly baseUrl: string;
   private readonly fetchImpl: typeof fetch;
 &nbsp;
-  constructor(private readonly config: TelegramConfig) {
-    if (!config.botToken?.trim()) throw new ValidationError("botToken is required");
-    if (!config.chatId?.trim()) throw new ValidationError("chatId is required");
-    this.baseUrl = config.baseUrl ?? "https://api.telegram.org";
+  constructor(private readonly config: SignalConfig) {
+    if (!config.number?.trim()) throw new ValidationError("number is required");
+    if (!config.recipients?.length || config.recipients.some((recipient) =&gt; !recipient.trim())) {
+      throw new ValidationError("at least one recipient is required");
+    }
+    this.baseUrl = config.baseUrl ?? "http://localhost:8080";
     this.fetchImpl = config.fetch ?? fetch;
   }
 &nbsp;
   async send(message: string): Promise&lt;void&gt; {
-    const url = new URL(`/bot${this.config.botToken}/sendMessage`, this.baseUrl);
+    if (!message?.trim()) <span class="branch-0 cbranch-no" title="branch not covered" >throw new ValidationError("message is required");</span>
+    const url = new URL("/v2/send", this.baseUrl);
     const response = await this.fetchImpl(url.toString(), {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ chat_id: this.config.chatId, text: message })
+      body: JSON.stringify({
+        message,
+        number: this.config.number,
+        recipients: [...this.config.recipients]
+      })
     });
     if (!response.ok) throw new Error(await response.text());
   }
