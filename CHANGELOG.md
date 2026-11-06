@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.11.2
+- Security patch: resolved `alpine`, `nodemailer` and `express`.
+
 ## 1.11.1
 
 - Security patch: resolved `cookie` and `qs` vulnerabilities, including low severity findings.
